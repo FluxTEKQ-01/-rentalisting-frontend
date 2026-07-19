@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
+// In development Vite proxies this path to the local Express server. In a
+// production Vercel deployment, set VITE_API_BASE_URL to the public URL of the
+// separately deployed backend (for example, https://rentalisting-api.example.com/api).
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
