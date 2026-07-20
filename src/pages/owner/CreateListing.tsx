@@ -20,7 +20,7 @@ export default function CreateListing() {
   const [formData, setFormData] = useState<PropertyFormData>({
     title: '',
     description: '',
-    propertyType: 'apartment',
+    propertyType: 'house_apartment',
     price: 0,
     maxPrice: undefined,
     bedrooms: 0,
@@ -270,7 +270,7 @@ export default function CreateListing() {
         );
 
       case 3:
-        const isRangeType = formData.propertyType === 'commercial' || formData.propertyType === 'land';
+        const isRangeType = ['office', 'warehouse', 'open_plot_land', 'coworking', 'commercial_building', 'parking', 'showroom', 'industrial', 'storage'].includes(formData.propertyType);
         return (
           <div className="space-y-4">
             {isRangeType ? (
@@ -365,7 +365,7 @@ export default function CreateListing() {
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                       formData.amenities.includes(amenity)
                         ? 'bg-primary text-white border-primary'
-                        : 'bg-surface text-neutral-700 border-neutral-900/15 hover:border-primary'
+                        : 'bg-surface text-neutral-700 border-[#E2E8F0] hover:border-primary'
                     }`}
                   >
                     {amenity}
@@ -385,7 +385,7 @@ export default function CreateListing() {
               </label>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                 {imagePreview.map((preview, i) => (
-                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-neutral group">
+                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-[#E2E8F0] group">
                     <img src={preview} alt="" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -397,7 +397,7 @@ export default function CreateListing() {
                   </div>
                 ))}
                 {imagePreview.length < 10 && (
-                  <label className="aspect-square rounded-lg border-2 border-dashed border-neutral-900/15 flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
+                  <label className="aspect-square rounded-lg border-2 border-dashed border-[#E2E8F0] flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
                     <svg className="w-8 h-8 text-neutral-700/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                     </svg>
@@ -416,12 +416,12 @@ export default function CreateListing() {
         );
 
       case 5:
-        const isRangeReview = formData.propertyType === 'commercial' || formData.propertyType === 'land';
+        const isRangeReview = ['office', 'warehouse', 'open_plot_land', 'coworking', 'commercial_building', 'parking', 'showroom', 'industrial', 'storage'].includes(formData.propertyType);
         return (
           <div className="space-y-4">
             <h3 className="font-bold text-lg text-primary font-display">Review Your Listing</h3>
             <div className="space-y-3 text-sm">
-              <div className="grid grid-cols-2 gap-4 p-4 bg-neutral rounded-lg">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-[#E2E8F0] rounded-lg">
                 <div><span className="text-neutral-700">Title:</span> <span className="font-medium">{formData.title}</span></div>
                 <div><span className="text-neutral-700">Type:</span> <span className="font-medium">{formData.propertyType}</span></div>
                 <div><span className="text-neutral-700">Price:</span> <span className="font-medium">
@@ -473,8 +473,8 @@ export default function CreateListing() {
                   s.id === step
                     ? 'bg-primary text-white'
                     : s.id < step
-                    ? 'bg-success text-white'
-                    : 'bg-neutral text-neutral-700/40'
+                    ? 'bg-primary text-white'
+                        : 'bg-[#E2E8F0] text-neutral-700/40'
                 }`}
               >
                 {s.id < step ? (
@@ -489,7 +489,7 @@ export default function CreateListing() {
                 {s.label}
               </span>
             </div>
-            {s.id < 5 && <div className={`w-8 md:w-16 h-0.5 mx-2 ${s.id < step ? 'bg-success' : 'bg-neutral'}`} />}
+            {s.id < 5 && <div className={`w-8 md:w-16 h-0.5 mx-2 ${s.id < step ? 'bg-primary' : 'bg-[#E2E8F0]'}`} />}
           </div>
         ))}
       </div>

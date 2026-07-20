@@ -93,7 +93,7 @@ export default function ReviewListing() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4 py-4 border-y border-neutral-900/5 mb-4">
+          <div className="flex flex-wrap gap-4 py-4 border-y border-[#E2E8F0] mb-4">
             {property.bedrooms > 0 && <span className="text-sm"><strong>{property.bedrooms}</strong> Beds</span>}
             {property.bathrooms > 0 && <span className="text-sm"><strong>{property.bathrooms}</strong> Baths</span>}
             <span className="text-sm"><strong>{property.area}</strong> {property.areaUnit}</span>
@@ -138,7 +138,7 @@ export default function ReviewListing() {
             <h3 className="font-semibold text-primary font-display mb-3">Images ({property.images.length})</h3>
             <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
               {property.images.map((img: any, i: number) => (
-                <a key={i} href={img.url} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-neutral">
+                <a key={i} href={img.url} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-[#E2E8F0]">
                   <img src={img.url} alt="" className="w-full h-full object-cover" loading="lazy" />
                 </a>
               ))}
@@ -149,7 +149,7 @@ export default function ReviewListing() {
         {property.videoUrl && (
           <Card className="p-6">
             <h3 className="font-semibold text-primary font-display mb-3">Video</h3>
-            <div className="aspect-video rounded-xl overflow-hidden bg-neutral">
+            <div className="aspect-video rounded-xl overflow-hidden bg-[#E2E8F0]">
                <iframe src={toEmbedUrl(property.videoUrl)} className="w-full h-full" allowFullScreen title="Property video" />
             </div>
           </Card>

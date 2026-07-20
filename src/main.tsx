@@ -27,7 +27,7 @@ createRoot(document.getElementById('root')!).render(
             position="top-right"
             toastOptions={{
               duration: 4000,
-              style: { borderRadius: '8px', background: '#2D2B2A', color: '#F8F6F3' },
+              style: { borderRadius: '8px', background: '#0F4C81', color: '#ffffff' },
             }}
           />
         </AuthProvider>

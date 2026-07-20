@@ -50,7 +50,7 @@ export default function MyListings() {
         </Link>
       </div>
 
-      <div className="flex gap-1 mb-6 bg-surface rounded-lg p-1 shadow-sm border border-neutral-900/5 overflow-x-auto">
+      <div className="flex gap-1 mb-6 bg-surface rounded-lg p-1 shadow-sm border border-[#E2E8F0] overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.label}
@@ -81,7 +81,7 @@ export default function MyListings() {
               <Card className={`p-4 hover:shadow-md transition-shadow ${property.status === 'rejected' ? 'border-l-4 border-error' : ''}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <div className="w-16 h-16 rounded-lg bg-neutral overflow-hidden shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-[#E2E8F0] overflow-hidden shrink-0">
                       {property.images?.[0]?.url ? (
                         <img src={property.images[0].url} alt="" className="w-full h-full object-cover" />
                       ) : (

@@ -25,7 +25,7 @@ export default function About() {
                 'Fair and transparent rental process',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-success mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>{item}</span>

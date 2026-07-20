@@ -36,7 +36,7 @@ export default function PropertyDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
         <div className="lg:col-span-2 space-y-6">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="relative rounded-2xl overflow-hidden bg-neutral h-[350px] md:h-[480px]">
+            <div className="relative rounded-2xl overflow-hidden bg-[#E2E8F0] h-[350px] md:h-[480px]">
               {property.images?.[selectedImage]?.url ? (
                 <img src={property.images[selectedImage].url} alt={property.title} className="w-full h-full object-cover" />
               ) : (
@@ -55,7 +55,7 @@ export default function PropertyDetails() {
                     key={i}
                     onClick={() => setSelectedImage(i)}
                     className={`shrink-0 w-20 h-16 rounded-xl overflow-hidden border-2 transition-all ${
-                      i === selectedImage ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-neutral-900/20'
+                      i === selectedImage ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-[#E2E8F0]'
                     }`}
                   >
                     <img src={img.url} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -90,7 +90,7 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-6 py-5 border-y border-neutral-900/5 mb-6">
+              <div className="flex flex-wrap gap-6 py-5 border-y border-[#E2E8F0] mb-6">
                 {property.bedrooms > 0 && (
                   <div className="text-center">
                     <p className="font-display text-2xl font-bold text-primary">{property.bedrooms}</p>
@@ -135,7 +135,7 @@ export default function PropertyDetails() {
               {property.videoUrl && (
                 <div className="mb-6">
                   <h2 className="font-display text-lg font-bold text-primary mb-3">Video tour</h2>
-                  <div className="aspect-video rounded-2xl overflow-hidden bg-neutral">
+                  <div className="aspect-video rounded-2xl overflow-hidden bg-[#E2E8F0]">
                     <iframe src={toEmbedUrl(property.videoUrl)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Property video" />
                   </div>
                 </div>
@@ -171,7 +171,7 @@ export default function PropertyDetails() {
         <div className="space-y-6">
           <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}>
             <Card className="p-6">
-              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-neutral-900/5">
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[#E2E8F0]">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-lg">
                   {property.owner?.name?.charAt(0) || 'O'}
                 </div>

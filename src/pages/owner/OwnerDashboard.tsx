@@ -6,8 +6,8 @@ import type { Property } from '../../types';
 
 const statCards = [
   { label: 'Total Listings', key: '', color: 'bg-primary/10 text-primary', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
-  { label: 'Published', key: 'published', color: 'bg-success/10 text-success', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { label: 'Pending', key: 'pending', color: 'bg-secondary/10 text-secondary', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { label: 'Published', key: 'published', color: 'bg-primary/10 text-primary', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { label: 'Pending', key: 'pending', color: 'bg-primary/10 text-primary', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
   { label: 'Rejected', key: 'rejected', color: 'bg-error/10 text-error', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' },
 ];
 
@@ -75,7 +75,7 @@ export default function OwnerDashboard() {
               <Card className="p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 rounded-lg bg-neutral overflow-hidden shrink-0">
+                    <div className="w-12 h-12 rounded-lg bg-[#E2E8F0] overflow-hidden shrink-0">
                       {property.images?.[0]?.url ? (
                         <img src={property.images[0].url} alt="" className="w-full h-full object-cover" />
                       ) : (

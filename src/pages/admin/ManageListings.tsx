@@ -62,7 +62,7 @@ export default function ManageListings() {
                 <Card className="p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <div className="w-14 h-14 rounded-lg bg-neutral overflow-hidden shrink-0">
+                      <div className="w-14 h-14 rounded-lg bg-[#E2E8F0] overflow-hidden shrink-0">
                         {property.images?.[0]?.url ? (
                           <img src={property.images[0].url} alt="" className="w-full h-full object-cover" />
                         ) : (

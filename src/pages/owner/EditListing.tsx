@@ -218,7 +218,7 @@ export default function EditListing() {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                   formData.amenities.includes(amenity)
                 ? 'bg-primary text-white border-primary'
-                : 'bg-surface text-neutral-700 border-neutral-900/15 hover:border-primary'
+                : 'bg-surface text-neutral-700 border-[#E2E8F0] hover:border-primary'
                 }`}
               >
                 {amenity}
@@ -237,7 +237,7 @@ export default function EditListing() {
           />
         </div>
 
-        <div className="flex justify-between pt-4 border-t border-neutral-900/5">
+        <div className="flex justify-between pt-4 border-t border-[#E2E8F0]">
           <Button variant="ghost" onClick={() => navigate('/owner/listings')}>Cancel</Button>
           {isRejected ? (
             <Button onClick={() => mutation.mutate()} loading={mutation.isPending}>

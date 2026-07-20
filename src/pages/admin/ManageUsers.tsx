@@ -53,7 +53,7 @@ export default function ManageUsers() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-sm text-neutral-700 border-b border-neutral-900/5">
+                <tr className="text-left text-sm text-neutral-700 border-b border-[#E2E8F0]">
                   <th className="pb-3 font-medium">User</th>
                   <th className="pb-3 font-medium">Email</th>
                   <th className="pb-3 font-medium">Mobile</th>
@@ -65,7 +65,7 @@ export default function ManageUsers() {
               </thead>
               <tbody>
                 {data.data.map((user: any) => (
-                  <tr key={user._id} className="border-b border-neutral-900/5 text-sm">
+                  <tr key={user._id} className="border-b border-[#E2E8F0] text-sm">
                     <td className="py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xs">
