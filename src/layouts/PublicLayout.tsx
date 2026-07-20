@@ -13,19 +13,23 @@ export default function PublicLayout() {
 
   return <div className="flex min-h-screen flex-col bg-neutral">
     <header className="site-header sticky top-0 z-40 border-b border-[#E2E8F0]">
-      <div className="container-custom flex h-20 items-center md:h-28">
-        <Link to="/" className="flex items-center py-1 text-primary shrink-0" onClick={close}>
-          <img src="/logo.png" alt="BookMySpace" className="h-16 w-auto md:h-24" />
+      <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8 md:h-20 relative">
+        <Link to="/" className="flex items-center shrink-0" onClick={close}>
+          <img src="/logo.png" alt="BookMySpace" className="h-7 w-auto md:h-9" />
         </Link>
-        <nav className="ml-8 hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
-          <Link className="hover:text-primary whitespace-nowrap" to="/properties">Explore rentals</Link>
-          <Link className="hover:text-primary whitespace-nowrap" to="/about">About us</Link>
-          <Link className="hover:text-primary whitespace-nowrap" to="/contact">Contact</Link>
+        <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-700 md:flex md:absolute md:left-1/2 md:-translate-x-1/2">
+          <Link className="hover:text-primary whitespace-nowrap transition-colors" to="/properties">Explore rentals</Link>
+          <Link className="hover:text-primary whitespace-nowrap transition-colors" to="/about">About us</Link>
+          <Link className="hover:text-primary whitespace-nowrap transition-colors" to="/contact">Contact</Link>
         </nav>
-        {isAuthenticated && <div className="ml-auto hidden items-center gap-2 md:flex">
-          {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
-          <button className="btn-outline btn-sm" onClick={logout}>Sign out</button>
-        </div>}
+        <div className="hidden items-center gap-2 md:flex">
+          {isAuthenticated && (
+            <>
+              {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
+              <button className="btn-outline btn-sm" onClick={logout}>Sign out</button>
+            </>
+          )}
+        </div>
         <button className="ml-auto rounded-md p-2 text-secondary hover:bg-[#eef2ff] md:hidden" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}><MenuIcon open={menuOpen} /></button>
       </div>
       {menuOpen && <div className="container-custom border-t border-[#E2E8F0] py-3 md:hidden">
@@ -40,7 +44,7 @@ export default function PublicLayout() {
     <main className="flex-1"><Outlet /></main>
     <footer className="bg-primary text-white">
       <div className="container-custom grid gap-10 py-14 md:grid-cols-[1.7fr_1fr_1fr]">
-        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-20 w-auto brightness-0 invert md:h-28" /></div><p className="max-w-sm text-sm leading-6 text-white/70">At BookMySpace, trust isn't a promise — it's our process. Every listing you see has passed a manual review by our team to ensure accuracy, quality photos, and verified details. Whether you're searching for an office, a retail space, or your next home, we connect you directly with verified owners. Because when every listing is reviewed, every move begins with confidence.</p></div>
+        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-8 w-auto brightness-0 invert md:h-10" /></div><p className="max-w-sm text-sm leading-6 text-white/70">At BookMySpace, trust isn't a promise — it's our process. Every listing you see has passed a manual review by our team to ensure accuracy, quality photos, and verified details. Whether you're searching for an office, a retail space, or your next home, we connect you directly with verified owners. Because when every listing is reviewed, every move begins with confidence.</p></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Rental Properties</h3><div className="flex flex-col gap-2 text-sm text-white/70">{propertyCategories.map(cat => <Link key={cat.value} to={`/properties?propertyType=${cat.value}`}>{cat.label}</Link>)}</div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/">Home</Link><Link to="/properties">Explore rentals</Link><Link to="/register">List your property</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div></div>
       </div>

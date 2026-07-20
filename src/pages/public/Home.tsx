@@ -3,6 +3,18 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { propertyApi, propertyCategories } from '../../api/endpoints';
 import type { Property } from '../../types';
+import ScrollVelocity from '../../components/ui/ScrollVelocity';
+
+const heroTaglineItems = [
+  "Verified Listings. Trusted Rentals.",
+  "Find. Connect. Rent.",
+  "Your Space, Your Choice.",
+  "Rent Smarter with BookMySpace.",
+  "Connecting Owners with Tenants.",
+  "From Homes to Commercial Spaces.",
+  "Search with Confidence.",
+  "Discover Spaces That Fit Your Lifestyle."
+];
 
 const categoryIcons: Record<string, string> = {
   office: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z',
@@ -30,21 +42,32 @@ const propertyTypes = [
   ['Hotels & Banquet Halls', 'hotel_banquet'], ['Shooting Locations', 'shooting_location'], ['Storage Spaces', 'storage'],
 ];
 
+const visualCategories = [
+  { title: 'Office Spaces', value: 'office', desc: 'Corporate offices, desk setups & commercial workspace hubs', image: '/categories/office.png' },
+  { title: 'Houses & Apartments', value: 'house_apartment', desc: 'Verified apartments, builder floors & family homes', image: '/categories/apartment.png' },
+  { title: 'Shops & Retail', value: 'shop_retail', desc: 'High footfall retail outlets, stores & commercial units', image: '/categories/retail.png' },
+  { title: 'Luxury Villas', value: 'villa', desc: 'Independent villas, luxury bungalows & private estates', image: '/categories/villa.png' },
+  { title: 'Warehouses', value: 'warehouse', desc: 'Industrial storage, logistics centers & godowns', image: '/categories/warehouse.png' },
+  { title: 'Event Venues', value: 'event_venue', desc: 'Banquet halls, celebration grounds & party venues', image: '/categories/event.png' },
+  { title: 'Open Plots & Land', value: 'open_plot_land', desc: 'Commercial & residential land plots for lease', image: '/categories/land.png' },
+  { title: 'Co-working Spaces', value: 'coworking', desc: 'Shared desks, private cabins & startup workspaces', image: '/categories/coworking.png' },
+  { title: 'Commercial Buildings', value: 'commercial_building', desc: 'Standalone towers & commercial business complexes', image: '/categories/commercial.png' },
+  { title: 'Parking Spaces', value: 'parking', desc: 'Dedicated vehicle parking slots & fleet storage', image: '/categories/parking.png' },
+  { title: 'Showrooms', value: 'showroom', desc: 'Glass-front display showrooms & retail brand outlets', image: '/categories/showroom.png' },
+  { title: 'Industrial Spaces', value: 'industrial', desc: 'Manufacturing plants, factories & industrial units', image: '/categories/industrial.png' },
+  { title: 'Hotels & Banquets', value: 'hotel_banquet', desc: 'Hospitality properties, hotels & banquet spaces', image: '/categories/hotel_banquet.png' },
+  { title: 'Shooting Locations', value: 'shooting_location', desc: 'Film sets, photo studios & production sets', image: '/categories/shooting_location.png' },
+  { title: 'Storage Spaces', value: 'storage', desc: 'Self-storage lockers, inventory & safe deposit space', image: '/categories/storage.png' }
+];
+
 function Icon({ name }: { name: 'search' | 'pin' | 'shield' | 'message' | 'filter' | 'check' | 'arrow' }) {
   const paths = { search: 'm21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z', pin: 'M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z', shield: 'M12 3 5 6v5c0 4.7 3 8.7 7 10 4-1.3 7-5.3 7-10V6l-7-3Z', message: 'M20 11.5a7.5 7.5 0 0 1-8 7.5 8.3 8.3 0 0 1-3.8-.9L4 19l1.1-3.3A7.3 7.3 0 0 1 4 12a7.5 7.5 0 0 1 8-7.5 7.5 7.5 0 0 1 8 7Z', filter: 'M4 6h16M7 12h10m-7 6h4', check: 'm5 12 4 4L19 6', arrow: 'M5 12h14m-6-6 6 6-6 6' };
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d={paths[name]} /></svg>;
 }
 
 function RecentCard({ property }: { property: Property }) {
-  const [saved, setSaved] = useState(false); const image = property.images?.[0]?.url;
-  return <article className="card-hover flex h-full flex-col">
-    <Link to={`/properties/${property._id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">
-      {image ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}
-      <span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Verified</span>
-      <button aria-label="Save property" onClick={(event) => { event.preventDefault(); setSaved(!saved); }} className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-sm ${saved ? 'text-error' : 'text-secondary'}`}>{saved ? '♥' : '♡'}</button>
-    </Link>
-    <div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div><div className="mt-5 grid grid-cols-3 border-y border-[#E2E8F0] py-3 text-center text-xs text-neutral-700"><span>{property.bedrooms || '—'} BHK</span><span>{property.bathrooms || '—'} bath</span><span>{property.area} {property.areaUnit || 'sq ft'}</span></div><Link className="btn-outline btn-sm mt-4" to={`/properties/${property._id}`}>View details</Link></div>
-  </article>;
+  const image = property.images?.[0]?.url;
+  return <article className="card-hover flex h-full flex-col"><Link to={`/properties/${property._id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">{image ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}<span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span></Link><div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div><div className="mt-5 grid grid-cols-3 border-y border-[#E2E8F0] py-3 text-center text-xs text-neutral-700"><span>{property.bedrooms || '—'} BHK</span><span>{property.bathrooms || '—'} bath</span><span>{property.area} {property.areaUnit || 'sq ft'}</span></div><Link className="btn-outline btn-sm mt-4" to={`/properties/${property._id}`}>View details</Link></div></article>;
 }
 
 export default function Home() {
@@ -53,8 +76,101 @@ export default function Home() {
   const search = (event: React.FormEvent) => { event.preventDefault(); const query = new URLSearchParams(); if (location) query.set('keyword', location); if (type) query.set('propertyType', type); navigate(`/properties${query.size ? `?${query}` : ''}`); };
   return <>
     <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="border border-primary/20 bg-white/75 p-5 shadow-[12px_12px_0_#0F4C81] backdrop-blur-sm"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Quick search</p><h2 className="mt-2 text-2xl font-semibold">Find a space that fits.</h2><form onSubmit={search} className="mt-6 space-y-3"><label className="text-xs font-semibold text-neutral-700">Location<input className="input-field mt-1" value={location} onChange={e => setLocation(e.target.value)} placeholder="Search by area or keyword" /></label><label className="text-xs font-semibold text-neutral-700">Property type<select className="input-field mt-1" value={type} onChange={e => setType(e.target.value)}><option value="">Any type</option>{propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label><button className="btn-primary w-full" type="submit"><Icon name="search" />Search rentals</button></form><p className="mt-4 flex items-center gap-2 text-xs leading-5 text-neutral-700"><Icon name="shield" />Only reviewed listings are published.</p></div></div></section>
-    <section className="container-custom py-16 md:py-20"><div className="mb-8"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Browse rentals</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Browse by property type</h2><p className="mt-2 text-sm text-neutral-700">Start with the kind of space you need.</p></div><div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">{propertyTypes.map(([label, value]) => <Link key={value} to={`/properties?propertyType=${value}`} className="group flex min-h-28 flex-col justify-between border border-[#E2E8F0] bg-white p-5 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_8px_20px_rgba(15,76,129,.08)]"><span className="grid h-10 w-10 place-items-center bg-[#eef2ff] text-primary"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d={categoryIcons[value] || 'M4 6h16M4 12h16M4 18h16'} /></svg></span><span className="mt-6 flex items-center justify-between font-display text-sm font-semibold">{label}<span className="text-primary transition group-hover:translate-x-1">→</span></span></Link>)}</div></section>
-    <section className="border-y border-[#E2E8F0] bg-white"><div className="container-custom grid gap-10 py-16 md:grid-cols-[.9fr_1.1fr]"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Why choose BookMySpace</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">A trusted rental marketplace.</h2><p className="mt-5 max-w-md leading-7 text-neutral-700">BookMySpace focuses entirely on rental properties, giving tenants and owners a simpler way to connect.</p></div><div className="grid gap-3 sm:grid-cols-2">{[["Verified listings", "Every submitted property is manually reviewed before it becomes visible.", 'shield'], ["Wide variety", "Browse offices, shops, warehouses, homes, villas, event venues and more.", 'pin'], ["Direct enquiries", "Send an enquiry directly to a property owner when you are interested.", 'message'], ["Simple discovery", "Search by location, budget, property type and more.", 'search']].map(([title, text, icon]) => <div key={title} className="border border-[#E2E8F0] p-5"><div className="mb-6 text-primary"><Icon name={icon as 'shield' | 'pin' | 'message' | 'search'} /></div><h3 className="font-display text-base font-semibold">{title}</h3><p className="mt-2 text-sm leading-5 text-neutral-700">{text}</p></div>)}</div></div></section>
+    
+    <div className="bg-primary py-3.5 border-b border-[#0a355c] shadow-inner overflow-hidden select-none">
+      <ScrollVelocity
+        texts={[
+          <span className="inline-flex items-center gap-6 px-4">
+            {heroTaglineItems.map((text, index) => (
+              <span key={index} className="inline-flex items-center gap-6">
+                <span className="font-display text-sm md:text-base font-semibold tracking-wider uppercase text-white/95">
+                  {text}
+                </span>
+                <span className="text-accent font-bold text-xs select-none">✦</span>
+              </span>
+            ))}
+          </span>
+        ]}
+        velocity={40}
+        numCopies={6}
+        className="py-0.5"
+      />
+    </div>
+    
+    <section className="container-custom py-16 md:py-24">
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="mono text-[11px] uppercase tracking-[.14em] text-primary font-semibold">Browse rentals</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 md:text-4xl">Browse by property type</h2>
+          <p className="mt-2 text-sm text-neutral-700">Start with the kind of space you need.</p>
+        </div>
+        <Link className="text-sm font-semibold text-primary hover:underline flex items-center gap-1" to="/properties">
+          Explore all categories →
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {visualCategories.map(cat => (
+          <Link
+            key={cat.value}
+            to={`/properties?propertyType=${cat.value}`}
+            className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_36px_rgba(15,76,129,0.10)]"
+          >
+            <div className="flex h-44 w-full items-center justify-center p-2 rounded-xl bg-[#F8FAFC]">
+              <img
+                src={cat.image}
+                alt={cat.title}
+                className="max-h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div className="mt-5 text-center">
+              <h3 className="font-display text-lg font-bold text-neutral-900 transition-colors group-hover:text-primary flex items-center justify-center gap-1.5">
+                {cat.title}
+                <span className="text-primary transition-transform group-hover:translate-x-1">›</span>
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-neutral-700">
+                {cat.desc}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+    <section className="border-y border-[#E2E8F0] bg-white">
+      <div className="container-custom grid gap-12 py-16 md:grid-cols-[1fr_1.1fr] md:py-24 items-center">
+        <div>
+          <p className="mono text-[11px] uppercase tracking-[.14em] text-primary font-semibold">Why choose BookMySpace</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 md:text-4xl">A trusted rental marketplace.</h2>
+          <p className="mt-5 max-w-md leading-7 text-neutral-700">
+            BookMySpace focuses entirely on rental properties, giving tenants and owners a simpler, transparent way to connect.
+          </p>
+          <div className="mt-6 rounded-xl border border-primary/20 bg-[#F8FAFC] p-4.5 border-l-4 border-l-primary shadow-sm">
+            <h4 className="font-display text-sm font-bold text-primary flex items-center gap-2">
+              <Icon name="shield" /> Only Verified Properties. No Fake Listings.
+            </h4>
+            <p className="mt-1.5 text-xs leading-relaxed text-neutral-700">
+              Every listing is reviewed before publication, helping you search with confidence and peace of mind.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            ["Verified Listings", "Every submitted property is manually reviewed before it becomes visible.", 'shield'],
+            ["Wide Variety", "Browse offices, shops, warehouses, homes, villas, event venues and more.", 'pin'],
+            ["Direct Enquiries", "Send an enquiry directly to a property owner when you are interested.", 'message'],
+            ["Simple Discovery", "Search by location, budget, property type and more.", 'search']
+          ].map(([title, text, icon]) => (
+            <div key={title} className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-md">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef2ff] text-primary">
+                <Icon name={icon as 'shield' | 'pin' | 'message' | 'search'} />
+              </div>
+              <h3 className="font-display text-base font-bold text-neutral-900">{title}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-neutral-700">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
     <section className="container-custom py-16 md:py-20"><div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Approved rentals</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Recently added properties</h2><p className="mt-2 text-sm text-neutral-700">New listings that have completed our review process.</p></div><Link className="text-sm font-semibold text-primary hover:underline" to="/properties">Explore all rentals →</Link></div>{isLoading ? <div className="text-sm text-neutral-700">Loading recently added properties…</div> : data?.data?.length ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3">{data.data.map((property: Property) => <RecentCard key={property._id} property={property} />)}</div> : <div className="rounded-lg border border-dashed border-[#E2E8F0] p-10 text-center"><p className="font-display text-lg">No approved rentals are available right now.</p><p className="mt-2 text-sm text-neutral-700">Please check back soon or explore all rental listings.</p><Link className="btn-primary mt-5" to="/properties">Explore rentals</Link></div>}</section>
     <section id="how-it-works" className="border-t border-[#E2E8F0] bg-[#eef2ff]"><div className="container-custom py-16 md:py-20"><div className="max-w-xl"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">How BookMySpace works</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">From property submission to tenant enquiry.</h2></div><div className="mt-10 grid gap-3 md:grid-cols-4">{[["01", "Owners submit", "Property owners submit their rental property for review."], ["02", "We verify", "Our team reviews the submitted property information."], ["03", "Listings go live", "Approved properties are published for tenants to explore."], ["04", "Tenants enquire", "Potential tenants browse and send enquiries directly."]].map(([number, title, text]) => <div key={number} className="border border-primary/20 bg-white p-5"><p className="mono text-xs text-primary">{number}</p><h3 className="mt-8 font-display text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-5 text-neutral-700">{text}</p></div>)}</div></div></section>
     <section className="bg-primary"><div className="container-custom flex flex-col justify-between gap-6 py-12 text-white md:flex-row md:items-center"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-white/70">Looking for a rental property?</p><h2 className="mt-2 text-3xl font-semibold">Browse verified listings across multiple categories.</h2></div><Link className="btn-accent shrink-0" to="/properties">Explore rentals</Link></div></section>
