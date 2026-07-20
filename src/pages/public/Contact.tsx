@@ -179,14 +179,15 @@ export default function Contact() {
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
               </div>
               <p className="text-xs font-semibold text-neutral-900">Phone</p>
-              <p className="mt-1 text-[11px] text-neutral-700">+91 1800-123-4567</p>
+              <p className="mt-1 text-[11px] text-neutral-700">+91 9876543210</p>
             </div>
             <div className="rounded-[var(--radius-card)] border border-[#E2E8F0] bg-white p-5 text-center">
               <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#eef2ff] text-primary">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               </div>
               <p className="text-xs font-semibold text-neutral-900">Location</p>
-              <p className="mt-1 text-[11px] text-neutral-700">Mumbai, India</p>
+              <p className="mt-1 text-[11px] text-neutral-700">Hyderabad-Head Office
+8-2-686/1/A/D, Road No.12, Ministers Colony, NBT Nagar, Banjara Hills, Hyderabad, Telangana-500034, India</p>
             </div>
           </div>
         </div>
