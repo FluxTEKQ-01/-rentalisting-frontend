@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../store/authContext';
+import { propertyCategories } from '../api/endpoints';
 
 const MenuIcon = ({ open }: { open: boolean }) => <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeWidth="1.8" d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 7h16M4 12h16M4 17h16'} /></svg>;
 
@@ -12,15 +13,17 @@ export default function PublicLayout() {
 
   return <div className="flex min-h-screen flex-col bg-neutral">
     <header className="site-header sticky top-0 z-40 border-b border-[#E2E8F0]">
-      <div className="container-custom flex h-28 items-center justify-between gap-6">
-        <Link to="/" className="flex items-center py-1 text-primary" onClick={close}>
-          <img src="/logo.png" alt="BookMySpace" className="h-20 w-auto" />
-        </Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-neutral-700 md:flex">
-          <Link className="hover:text-primary" to="/properties">Explore rentals</Link>
-          <Link className="hover:text-primary" to="/about">About us</Link>
-          <Link className="hover:text-primary" to="/contact">Contact</Link>
-        </nav>
+      <div className="container-custom flex h-20 items-center justify-between gap-4 md:h-28">
+        <div className="flex items-center gap-4 md:gap-8">
+          <Link to="/" className="flex items-center py-1 text-primary shrink-0" onClick={close}>
+            <img src="/logo.png" alt="BookMySpace" className="h-16 w-auto md:h-24" />
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
+            <Link className="hover:text-primary whitespace-nowrap" to="/properties">Explore rentals</Link>
+            <Link className="hover:text-primary whitespace-nowrap" to="/about">About us</Link>
+            <Link className="hover:text-primary whitespace-nowrap" to="/contact">Contact</Link>
+          </nav>
+        </div>
         <div className="hidden items-center gap-2 md:flex">
           {isAuthenticated ? <>
             {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
@@ -44,8 +47,8 @@ export default function PublicLayout() {
     <main className="flex-1"><Outlet /></main>
     <footer className="bg-primary text-white">
       <div className="container-custom grid gap-10 py-14 md:grid-cols-[1.7fr_1fr_1fr]">
-        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-24 w-auto brightness-0 invert" /></div><p className="max-w-sm text-sm leading-6 text-white/70">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p><div className="mt-6 flex gap-2"><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">in</span><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">ig</span></div></div>
-        <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Properties</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/properties">Office spaces</Link><Link to="/properties?propertyType=house_apartment">Houses & Apartments</Link><Link to="/properties?propertyType=commercial_building">Commercial lease</Link><Link to="/properties?propertyType=open_plot_land">Plots & land</Link></div></div>
+        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-20 w-auto brightness-0 invert md:h-28" /></div><p className="max-w-sm text-sm leading-6 text-white/70">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p></div>
+        <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Rental Properties</h3><div className="flex flex-col gap-2 text-sm text-white/70">{propertyCategories.map(cat => <Link key={cat.value} to={`/properties?propertyType=${cat.value}`}>{cat.label}</Link>)}</div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/">Home</Link><Link to="/properties">Explore rentals</Link><Link to="/register">List your property</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div></div>
       </div>
       <div className="container-custom border-t border-white/10 py-6 text-[11px] text-white/50">&copy; {new Date().getFullYear()} BookMySpace. Reimagining real estate.</div>
