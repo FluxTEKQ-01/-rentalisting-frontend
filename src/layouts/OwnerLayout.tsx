@@ -32,7 +32,7 @@ export default function OwnerLayout() {
       >
         <div className="p-5 border-b border-[#E2E8F0]">
           <Link to="/owner" className="flex items-center gap-2.5 group">
-            <img src="/logo.png" alt="BookMySpace" className="h-7 w-auto" />
+            <img src="/logo.png" alt="BookMySpace" className="h-12 w-auto" />
             <div>
               <span className="font-display text-sm font-bold text-primary leading-tight block">Owner Dashboard</span>
               <span className="text-[11px] text-neutral-700/60 font-medium">Manage your listings</span>
