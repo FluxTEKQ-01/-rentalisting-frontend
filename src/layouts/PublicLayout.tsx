@@ -12,9 +12,9 @@ export default function PublicLayout() {
 
   return <div className="flex min-h-screen flex-col bg-neutral">
     <header className="site-header sticky top-0 z-40 border-b border-[#E2E8F0]">
-      <div className="container-custom flex h-20 items-center justify-between gap-6">
+      <div className="container-custom flex h-28 items-center justify-between gap-6">
         <Link to="/" className="flex items-center py-1 text-primary" onClick={close}>
-          <img src="/logo.png" alt="BookMySpace" className="h-14 w-auto" />
+          <img src="/logo.png" alt="BookMySpace" className="h-20 w-auto" />
         </Link>
         <nav className="hidden items-center gap-7 text-sm font-medium text-neutral-700 md:flex">
           <Link className="hover:text-primary" to="/properties">Explore rentals</Link>
@@ -44,7 +44,7 @@ export default function PublicLayout() {
     <main className="flex-1"><Outlet /></main>
     <footer className="bg-primary text-white">
       <div className="container-custom grid gap-10 py-14 md:grid-cols-[1.7fr_1fr_1fr]">
-        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-16 w-auto brightness-0 invert" /></div><p className="max-w-sm text-sm leading-6 text-white/70">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p><div className="mt-6 flex gap-2"><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">in</span><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">ig</span></div></div>
+        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-24 w-auto brightness-0 invert" /></div><p className="max-w-sm text-sm leading-6 text-white/70">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p><div className="mt-6 flex gap-2"><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">in</span><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">ig</span></div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Properties</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/properties">Office spaces</Link><Link to="/properties?propertyType=house_apartment">Houses & Apartments</Link><Link to="/properties?propertyType=commercial_building">Commercial lease</Link><Link to="/properties?propertyType=open_plot_land">Plots & land</Link></div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/">Home</Link><Link to="/properties">Explore rentals</Link><Link to="/register">List your property</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div></div>
       </div>
