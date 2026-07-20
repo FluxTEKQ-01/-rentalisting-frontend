@@ -13,41 +13,34 @@ export default function PublicLayout() {
 
   return <div className="flex min-h-screen flex-col bg-neutral">
     <header className="site-header sticky top-0 z-40 border-b border-[#E2E8F0]">
-      <div className="container-custom flex h-20 items-center justify-between gap-4 md:h-28">
-        <div className="flex items-center gap-4 md:gap-8">
-          <Link to="/" className="flex items-center py-1 text-primary shrink-0" onClick={close}>
-            <img src="/logo.png" alt="BookMySpace" className="h-16 w-auto md:h-24" />
-          </Link>
-          <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
-            <Link className="hover:text-primary whitespace-nowrap" to="/properties">Explore rentals</Link>
-            <Link className="hover:text-primary whitespace-nowrap" to="/about">About us</Link>
-            <Link className="hover:text-primary whitespace-nowrap" to="/contact">Contact</Link>
-          </nav>
-        </div>
-        <div className="hidden items-center gap-2 md:flex">
-          {isAuthenticated ? <>
-            {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
-            <button className="btn-outline btn-sm" onClick={logout}>Sign out</button>
-          </> : <>
-            <Link className="btn-ghost btn-sm" to="/login">Sign in</Link>
-            <Link className="btn-primary btn-sm" to="/register">List a property</Link>
-          </>}
-        </div>
-        <button className="rounded-md p-2 text-secondary hover:bg-[#eef2ff] md:hidden" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}><MenuIcon open={menuOpen} /></button>
+      <div className="container-custom flex h-20 items-center md:h-28">
+        <Link to="/" className="flex items-center py-1 text-primary shrink-0" onClick={close}>
+          <img src="/logo.png" alt="BookMySpace" className="h-16 w-auto md:h-24" />
+        </Link>
+        <nav className="ml-8 hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
+          <Link className="hover:text-primary whitespace-nowrap" to="/properties">Explore rentals</Link>
+          <Link className="hover:text-primary whitespace-nowrap" to="/about">About us</Link>
+          <Link className="hover:text-primary whitespace-nowrap" to="/contact">Contact</Link>
+        </nav>
+        {isAuthenticated && <div className="ml-auto hidden items-center gap-2 md:flex">
+          {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
+          <button className="btn-outline btn-sm" onClick={logout}>Sign out</button>
+        </div>}
+        <button className="ml-auto rounded-md p-2 text-secondary hover:bg-[#eef2ff] md:hidden" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}><MenuIcon open={menuOpen} /></button>
       </div>
       {menuOpen && <div className="container-custom border-t border-[#E2E8F0] py-3 md:hidden">
         <nav className="flex flex-col gap-1 text-sm font-medium">
           <Link className="rounded-md px-3 py-2 hover:bg-[#eef2ff]" to="/properties" onClick={close}>Explore rentals</Link>
           <Link className="rounded-md px-3 py-2 hover:bg-[#eef2ff]" to="/about" onClick={close}>About us</Link>
           <Link className="rounded-md px-3 py-2 hover:bg-[#eef2ff]" to="/contact" onClick={close}>Contact</Link>
-          {isAuthenticated ? <button className="mt-2 btn-outline btn-sm" onClick={() => { logout(); close(); }}>Sign out</button> : <div className="mt-2 flex gap-2"><Link className="btn-ghost btn-sm" to="/login" onClick={close}>Sign in</Link><Link className="btn-primary btn-sm" to="/register" onClick={close}>List a property</Link></div>}
+          {isAuthenticated && <button className="mt-2 btn-outline btn-sm" onClick={() => { logout(); close(); }}>Sign out</button>}
         </nav>
       </div>}
     </header>
     <main className="flex-1"><Outlet /></main>
     <footer className="bg-primary text-white">
       <div className="container-custom grid gap-10 py-14 md:grid-cols-[1.7fr_1fr_1fr]">
-        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-20 w-auto brightness-0 invert md:h-28" /></div><p className="max-w-sm text-sm leading-6 text-white/70">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p></div>
+        <div><div className="mb-6"><img src="/logo.png" alt="BookMySpace" className="h-20 w-auto brightness-0 invert md:h-28" /></div><p className="max-w-sm text-sm leading-6 text-white/70">At BookMySpace, trust isn't a promise — it's our process. Every listing you see has passed a manual review by our team to ensure accuracy, quality photos, and verified details. Whether you're searching for an office, a retail space, or your next home, we connect you directly with verified owners. Because when every listing is reviewed, every move begins with confidence.</p></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Rental Properties</h3><div className="flex flex-col gap-2 text-sm text-white/70">{propertyCategories.map(cat => <Link key={cat.value} to={`/properties?propertyType=${cat.value}`}>{cat.label}</Link>)}</div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/">Home</Link><Link to="/properties">Explore rentals</Link><Link to="/register">List your property</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div></div>
       </div>
