@@ -30,10 +30,10 @@ export default function AdminLayout() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="p-5 border-b border-[#E2E8F0]">
-          <Link to="/admin" className="flex items-center gap-2.5 group">
-            <img src="/logo.png" alt="BookMySpace" className="h-16 w-auto" />
-            <div>
+        <div className="px-5 py-4 border-b border-[#E2E8F0]">
+          <Link to="/admin" className="flex flex-col items-start gap-2 group">
+            <img src="/logo.png" alt="BookMySpace" className="h-7 w-auto object-contain" />
+            <div className="pt-0.5">
               <span className="font-display text-sm font-bold text-primary leading-tight block">Admin Panel</span>
               <span className="text-[11px] text-neutral-700/60 font-medium">Platform management</span>
             </div>
