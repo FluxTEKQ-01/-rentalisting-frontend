@@ -1,145 +1,55 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../store/authContext';
-import { Button } from '../components/ui';
 
+const MenuIcon = ({ open }: { open: boolean }) => <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeWidth="1.8" d={open ? 'M6 6l12 12M18 6L6 18' : 'M4 7h16M4 12h16M4 17h16'} /></svg>;
+const BuildingIcon = () => <span className="grid h-6 w-6 place-items-center bg-primary text-[11px] font-bold text-white">B</span>;
 
 export default function PublicLayout() {
   const { isAuthenticated, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const close = () => setMenuOpen(false);
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-surface/85 backdrop-blur-xl border-b border-neutral-700/10 sticky top-0 z-40 shadow-sm transition-all duration-200">
-        <div className="container-custom">
-          <div className="flex items-center justify-between h-16 md:h-18">
-            <Link to="/" className="flex items-center gap-2 group">
-              <span className="font-display font-black text-2xl tracking-wider text-primary select-none">LUXEBNB</span>
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-1">
-              <div className="w-px h-5 bg-neutral-900/10 mx-3" />
-              {!isAuthenticated ? (
-                <div className="flex items-center gap-2.5">
-                  <Link to="/login">
-                    <Button variant="ghost" size="sm">Sign in</Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button variant="primary" size="sm">List Your Property</Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2.5">
-                  {user?.role === 'owner' && (
-                    <Link to="/owner">
-                      <Button variant="ghost" size="sm">Dashboard</Button>
-                    </Link>
-                  )}
-                  {user?.role === 'admin' && (
-                    <Link to="/admin">
-                      <Button variant="ghost" size="sm">Admin</Button>
-                    </Link>
-                  )}
-                  <Button variant="outline" size="sm" onClick={logout}>Sign out</Button>
-                </div>
-              )}
-            </nav>
-
-            <button
-              className="md:hidden p-2.5 rounded-lg hover:bg-primary/5 transition-colors"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle menu"
-            >
-              <svg className="w-5 h-5 text-neutral-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-
-          {menuOpen && (
-            <div className="md:hidden pb-5 border-t border-neutral-900/5 pt-4 space-y-1">
-              <div className="space-y-2">
-                {!isAuthenticated ? (
-                  <>
-                    <Link to="/login" onClick={() => setMenuOpen(false)} className="block">
-                      <Button variant="ghost" size="sm" className="w-full justify-start">Sign in</Button>
-                    </Link>
-                    <Link to="/register" onClick={() => setMenuOpen(false)} className="block">
-                      <Button variant="primary" size="sm" className="w-full">List Your Property</Button>
-                    </Link>
-                  </>
-                ) : (
-                  <Button variant="outline" size="sm" onClick={() => { logout(); setMenuOpen(false); }} className="w-full">
-                    Sign out
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
+  return <div className="flex min-h-screen flex-col bg-neutral">
+    <header className="site-header sticky top-0 z-40 border-b border-[#e0e3e5]">
+      <div className="container-custom flex h-16 items-center justify-between gap-6">
+        <Link to="/" className="flex items-center gap-2 text-secondary" onClick={close}>
+          <BuildingIcon /><span className="brand-mark text-sm font-bold">BOOKMYSPACE</span>
+        </Link>
+        <nav className="hidden items-center gap-7 text-sm font-medium text-neutral-700 md:flex">
+          <Link className="hover:text-primary" to="/properties">Explore rentals</Link>
+          <Link className="hover:text-primary" to="/about">About us</Link>
+          <Link className="hover:text-primary" to="/contact">Contact</Link>
+        </nav>
+        <div className="hidden items-center gap-2 md:flex">
+          {isAuthenticated ? <>
+            {(user?.role === 'owner' || user?.role === 'admin') && <button className="btn-ghost btn-sm" onClick={() => navigate(user.role === 'owner' ? '/owner' : '/admin')}>Dashboard</button>}
+            <button className="btn-outline btn-sm" onClick={logout}>Sign out</button>
+          </> : <>
+            <Link className="btn-ghost btn-sm" to="/login">Sign in</Link>
+            <Link className="btn-primary btn-sm" to="/register">List a property</Link>
+          </>}
         </div>
-      </header>
-
-      <main className="flex-1">
-        <Outlet />
-      </main>
-
-      <footer className="bg-neutral-900 text-white border-t border-neutral-800">
-        <div className="container-custom py-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div>
-              <Link to="/" className="flex items-center mb-4">
-                <span className="font-display font-black text-2xl tracking-wider text-white select-none">LUXEBNB</span>
-              </Link>
-              <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-                Redefining luxury living for the global nomad. Every stay is a sanctuary.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-display font-semibold text-secondary-light text-sm uppercase tracking-wider mb-4">Platform</h4>
-              <div className="flex flex-col gap-2.5 text-sm text-white/70">
-                <Link to="/properties?propertyType=apartment" className="hover:text-white transition-colors w-fit">Apartments</Link>
-                <Link to="/properties?propertyType=villa" className="hover:text-white transition-colors w-fit">Villas</Link>
-                <Link to="/properties" className="hover:text-white transition-colors w-fit">Locations</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-display font-semibold text-secondary-light text-sm uppercase tracking-wider mb-4">Company</h4>
-              <div className="flex flex-col gap-2.5 text-sm text-white/70">
-                <Link to="/careers" className="hover:text-white transition-colors w-fit">Careers</Link>
-                <Link to="/press" className="hover:text-white transition-colors w-fit">Press</Link>
-                <Link to="/contact" className="hover:text-white transition-colors w-fit">Contact</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-display font-semibold text-secondary-light text-sm uppercase tracking-wider mb-4">Legal</h4>
-              <div className="flex flex-col gap-2.5 text-sm text-white/70">
-                <Link to="/terms" className="hover:text-white transition-colors w-fit">Terms</Link>
-                <Link to="/privacy" className="hover:text-white transition-colors w-fit">Privacy</Link>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-white/10 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40">
-            <span>&copy; {new Date().getFullYear()} LUXEBNB Global. All rights reserved.</span>
-            <div className="flex items-center gap-4">
-              <button aria-label="Language selection" className="hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
-                </svg>
-              </button>
-              <button aria-label="Customer support chat" className="hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+        <button className="rounded-md p-2 text-secondary hover:bg-[#e9edff] md:hidden" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}><MenuIcon open={menuOpen} /></button>
+      </div>
+      {menuOpen && <div className="container-custom border-t border-[#e0e3e5] py-3 md:hidden">
+        <nav className="flex flex-col gap-1 text-sm font-medium">
+          <Link className="rounded-md px-3 py-2 hover:bg-[#e9edff]" to="/properties" onClick={close}>Explore rentals</Link>
+          <Link className="rounded-md px-3 py-2 hover:bg-[#e9edff]" to="/about" onClick={close}>About us</Link>
+          <Link className="rounded-md px-3 py-2 hover:bg-[#e9edff]" to="/contact" onClick={close}>Contact</Link>
+          {isAuthenticated ? <button className="mt-2 btn-outline btn-sm" onClick={() => { logout(); close(); }}>Sign out</button> : <div className="mt-2 flex gap-2"><Link className="btn-ghost btn-sm" to="/login" onClick={close}>Sign in</Link><Link className="btn-primary btn-sm" to="/register" onClick={close}>List a property</Link></div>}
+        </nav>
+      </div>}
+    </header>
+    <main className="flex-1"><Outlet /></main>
+    <footer className="bg-secondary text-white">
+      <div className="container-custom grid gap-10 py-14 md:grid-cols-[1.7fr_1fr_1fr]">
+        <div><div className="mb-5 flex items-center gap-2"><BuildingIcon /><span className="brand-mark text-sm font-bold">BOOKMYSPACE</span></div><p className="max-w-sm text-sm leading-6 text-[#c6cbd8]">Your trusted partner in finding the perfect space. We verify listings so every move begins with confidence.</p><div className="mt-6 flex gap-2"><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">in</span><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs">ig</span></div></div>
+        <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Properties</h3><div className="flex flex-col gap-3 text-sm text-[#c6cbd8]"><Link to="/properties">Buy residential</Link><Link to="/properties">Rent residential</Link><Link to="/properties?propertyType=commercial">Commercial lease</Link><Link to="/properties?propertyType=land">Plots & land</Link></div></div>
+        <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-[#c6cbd8]"><Link to="/">Home</Link><Link to="/properties">Explore rentals</Link><Link to="/register">List your property</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div></div>
+      </div>
+      <div className="container-custom border-t border-white/10 py-6 text-[11px] text-[#aeb7c9]">© {new Date().getFullYear()} BOOKMYSPACE. REIMAGINING REAL ESTATE.</div>
+    </footer>
+  </div>;
 }
