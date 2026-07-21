@@ -118,6 +118,9 @@ export const adminApi = {
       .put<ApiResponse<{ user: any }>>(`/admin/users/${id}/toggle-status`)
       .then((r) => r.data),
 
+  deleteUser: (id: string) =>
+    apiClient.delete<ApiResponse<null>>(`/admin/users/${id}`).then((r) => r.data),
+
   getReviews: (params?: Record<string, string>) =>
     apiClient
       .get<PaginatedResponse<Review>>(`/admin/reviews${toQueryString(params || {})}`)

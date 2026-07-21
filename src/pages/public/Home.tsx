@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { propertyApi, propertyCategories } from '../../api/endpoints';
 import type { Property } from '../../types';
 import ScrollVelocity from '../../components/ui/ScrollVelocity';
@@ -34,14 +35,6 @@ const categoryIcons: Record<string, string> = {
   storage: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
 };
 
-const propertyTypes = [
-  ['Office Spaces', 'office'], ['Shops & Retail', 'shop_retail'], ['Warehouses', 'warehouse'],
-  ['Houses & Apartments', 'house_apartment'], ['Villas', 'villa'], ['Open Plots & Land', 'open_plot_land'],
-  ['Event Venues', 'event_venue'], ['Co-working Spaces', 'coworking'], ['Commercial Buildings', 'commercial_building'],
-  ['Parking Spaces', 'parking'], ['Showrooms', 'showroom'], ['Industrial Spaces', 'industrial'],
-  ['Hotels & Banquet Halls', 'hotel_banquet'], ['Shooting Locations', 'shooting_location'], ['Storage Spaces', 'storage'],
-];
-
 const visualCategories = [
   { title: 'Office Spaces', value: 'office', desc: 'Corporate offices, desk setups & commercial workspace hubs', image: '/categories/office.png' },
   { title: 'Houses & Apartments', value: 'house_apartment', desc: 'Verified apartments, builder floors & family homes', image: '/categories/apartment.png' },
@@ -60,6 +53,76 @@ const visualCategories = [
   { title: 'Storage Spaces', value: 'storage', desc: 'Self-storage lockers, inventory & safe deposit space', image: '/categories/storage.png' }
 ];
 
+// Vector Graphics for How It Works Steps
+function Step1Vector() {
+  return (
+    <svg className="w-10 h-10 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="8" width="28" height="32" rx="4" fill="#0F4C81" fillOpacity="0.1" stroke="#0F4C81" strokeWidth="2" />
+      <path d="M18 16 H30 M18 22 H26" stroke="#0F4C81" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="32" cy="30" r="9" fill="#F58220" />
+      <path d="M32 26 V34 M28 30 L32 26 L36 30" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Step2Vector() {
+  return (
+    <svg className="w-10 h-10 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 6 L38 12 V22 C38 31 32 38 24 42 C16 38 10 31 10 22 V12 L24 6 Z" fill="#005EB8" fillOpacity="0.1" stroke="#005EB8" strokeWidth="2" />
+      <path d="M18 22 L22 26 L30 18" stroke="#F58220" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Step3Vector() {
+  return (
+    <svg className="w-10 h-10 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 24 L24 14 L36 24 V38 H12 Z" fill="#0F4C81" fillOpacity="0.15" stroke="#0F4C81" strokeWidth="2" />
+      <rect x="20" y="28" width="8" height="10" fill="#0F4C81" />
+      <circle cx="34" cy="14" r="7" fill="#10B981" />
+      <circle cx="34" cy="14" r="3" fill="#ffffff" />
+    </svg>
+  );
+}
+
+function Step4Vector() {
+  return (
+    <svg className="w-10 h-10 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 14 C8 10.7 10.7 8 14 8 H34 C37.3 8 40 10.7 40 14 V26 C40 29.3 37.3 32 34 32 H18 L10 38 V32 H14" fill="#005EB8" fillOpacity="0.1" stroke="#005EB8" strokeWidth="2" />
+      <circle cx="20" cy="20" r="2.5" fill="#F58220" />
+      <circle cx="27" cy="20" r="2.5" fill="#0F4C81" />
+      <circle cx="34" cy="20" r="2.5" fill="#F58220" />
+    </svg>
+  );
+}
+
+const howItWorksSteps = [
+  {
+    number: "01",
+    title: "Owners submit",
+    text: "Property owners submit their rental property with verified photos & details for review.",
+    icon: <Step1Vector />,
+  },
+  {
+    number: "02",
+    title: "We verify",
+    text: "Our dedicated review team inspects and verifies the property information.",
+    icon: <Step2Vector />,
+  },
+  {
+    number: "03",
+    title: "Listings go live",
+    text: "Approved listings are published instantly for genuine tenants to explore.",
+    icon: <Step3Vector />,
+  },
+  {
+    number: "04",
+    title: "Tenants enquire",
+    text: "Interested tenants browse verified spaces and send enquiries directly to owners.",
+    icon: <Step4Vector />,
+  },
+];
+
 function Icon({ name }: { name: 'search' | 'pin' | 'shield' | 'message' | 'filter' | 'check' | 'arrow' }) {
   const paths = { search: 'm21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z', pin: 'M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z', shield: 'M12 3 5 6v5c0 4.7 3 8.7 7 10 4-1.3 7-5.3 7-10V6l-7-3Z', message: 'M20 11.5a7.5 7.5 0 0 1-8 7.5 8.3 8.3 0 0 1-3.8-.9L4 19l1.1-3.3A7.3 7.3 0 0 1 4 12a7.5 7.5 0 0 1 8-7.5 7.5 7.5 0 0 1 8 7Z', filter: 'M4 6h16M7 12h10m-7 6h4', check: 'm5 12 4 4L19 6', arrow: 'M5 12h14m-6-6 6 6-6 6' };
   return <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d={paths[name]} /></svg>;
@@ -74,9 +137,10 @@ export default function Home() {
   const navigate = useNavigate(); const [location, setLocation] = useState(''); const [type, setType] = useState('');
   const { data, isLoading } = useQuery({ queryKey: ['recent-approved-rentals'], queryFn: () => propertyApi.list({ status: 'published', limit: '3', sort: 'latest' }) });
   const search = (event: React.FormEvent) => { event.preventDefault(); const query = new URLSearchParams(); if (location) query.set('keyword', location); if (type) query.set('propertyType', type); navigate(`/properties${query.size ? `?${query}` : ''}`); };
+  
   return <>
-    <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="border border-primary/20 bg-white/75 p-5 shadow-[12px_12px_0_#0F4C81] backdrop-blur-sm"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Quick search</p><h2 className="mt-2 text-2xl font-semibold">Find a space that fits.</h2><form onSubmit={search} className="mt-6 space-y-3"><label className="text-xs font-semibold text-neutral-700">Location<input className="input-field mt-1" value={location} onChange={e => setLocation(e.target.value)} placeholder="Search by area or keyword" /></label><label className="text-xs font-semibold text-neutral-700">Property type<select className="input-field mt-1" value={type} onChange={e => setType(e.target.value)}><option value="">Any type</option>{propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label><button className="btn-primary w-full" type="submit"><Icon name="search" />Search rentals</button></form><p className="mt-4 flex items-center gap-2 text-xs leading-5 text-neutral-700"><Icon name="shield" />Only reviewed listings are published.</p></div></div></section>
-    
+    <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore Rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="border border-primary/20 bg-white/75 p-5 shadow-[12px_12px_0_#0F4C81] backdrop-blur-sm"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Quick search</p><h2 className="mt-2 text-2xl font-semibold">Find a space that fits.</h2><form onSubmit={search} className="mt-6 space-y-3"><label className="text-xs font-semibold text-neutral-700">Location<input className="input-field mt-1" value={location} onChange={e => setLocation(e.target.value)} placeholder="Search by area or keyword" /></label><label className="text-xs font-semibold text-neutral-700">Property type<select className="input-field mt-1" value={type} onChange={e => setType(e.target.value)}><option value="">Any type</option>{propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label><button className="btn-primary w-full" type="submit"><Icon name="search" />Search rentals</button></form><p className="mt-4 flex items-center gap-2 text-xs leading-5 text-neutral-700"><Icon name="shield" />Only reviewed listings are published.</p></div></div></section>
+
     <div className="bg-primary py-3.5 border-b border-[#0a355c] shadow-inner overflow-hidden select-none">
       <ScrollVelocity
         texts={[
@@ -96,7 +160,7 @@ export default function Home() {
         className="py-0.5"
       />
     </div>
-    
+
     <section className="container-custom py-16 md:py-24">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -136,43 +200,186 @@ export default function Home() {
         ))}
       </div>
     </section>
-    <section className="border-y border-[#E2E8F0] bg-white">
+
+    {/* Why Choose BookMySpace Section with Motion & Animations */}
+    <section className="border-y border-[#E2E8F0] bg-white relative overflow-hidden">
       <div className="container-custom grid gap-12 py-16 md:grid-cols-[1fr_1.1fr] md:py-24 items-center">
         <div>
-          <p className="mono text-[11px] uppercase tracking-[.14em] text-primary font-semibold">Why choose BookMySpace</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 md:text-4xl">A trusted rental marketplace.</h2>
+          <p className="mono text-[11px] uppercase tracking-[.14em] text-primary font-semibold">
+            Why choose BookMySpace
+          </p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900 md:text-4xl">
+            A trusted rental marketplace.
+          </h2>
           <p className="mt-5 max-w-md leading-7 text-neutral-700">
             BookMySpace focuses entirely on rental properties, giving tenants and owners a simpler, transparent way to connect.
           </p>
-          <div className="mt-6 rounded-xl border border-primary/20 bg-[#F8FAFC] p-4.5 border-l-4 border-l-primary shadow-sm">
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mt-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-[#F8FAFC] to-[#eef2ff] p-5 border-l-4 border-l-primary shadow-sm relative overflow-hidden"
+          >
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-accent/10 rounded-full blur-xl pointer-events-none" />
             <h4 className="font-display text-sm font-bold text-primary flex items-center gap-2">
               <Icon name="shield" /> Only Verified Properties. No Fake Listings.
             </h4>
             <p className="mt-1.5 text-xs leading-relaxed text-neutral-700">
               Every listing is reviewed before publication, helping you search with confidence and peace of mind.
             </p>
-          </div>
+          </motion.div>
         </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           {[
             ["Verified Listings", "Every submitted property is manually reviewed before it becomes visible.", 'shield'],
             ["Wide Variety", "Browse offices, shops, warehouses, homes, villas, event venues and more.", 'pin'],
             ["Direct Enquiries", "Send an enquiry directly to a property owner when you are interested.", 'message'],
             ["Simple Discovery", "Search by location, budget, property type and more.", 'search']
-          ].map(([title, text, icon]) => (
-            <div key={title} className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-md">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef2ff] text-primary">
+          ].map(([title, text, icon], idx) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="group rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl"
+            >
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef2ff] text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                 <Icon name={icon as 'shield' | 'pin' | 'message' | 'search'} />
               </div>
-              <h3 className="font-display text-base font-bold text-neutral-900">{title}</h3>
+              <h3 className="font-display text-base font-bold text-neutral-900 group-hover:text-primary transition-colors">{title}</h3>
               <p className="mt-1.5 text-xs leading-relaxed text-neutral-700">{text}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
-    <section className="container-custom py-16 md:py-20"><div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Approved rentals</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Recently added properties</h2><p className="mt-2 text-sm text-neutral-700">New listings that have completed our review process.</p></div><Link className="text-sm font-semibold text-primary hover:underline" to="/properties">Explore all rentals →</Link></div>{isLoading ? <div className="text-sm text-neutral-700">Loading recently added properties…</div> : data?.data?.length ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3">{data.data.map((property: Property) => <RecentCard key={property._id} property={property} />)}</div> : <div className="rounded-lg border border-dashed border-[#E2E8F0] p-10 text-center"><p className="font-display text-lg">No approved rentals are available right now.</p><p className="mt-2 text-sm text-neutral-700">Please check back soon or explore all rental listings.</p><Link className="btn-primary mt-5" to="/properties">Explore rentals</Link></div>}</section>
-    <section id="how-it-works" className="border-t border-[#E2E8F0] bg-[#eef2ff]"><div className="container-custom py-16 md:py-20"><div className="max-w-xl"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">How BookMySpace works</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">From property submission to tenant enquiry.</h2></div><div className="mt-10 grid gap-3 md:grid-cols-4">{[["01", "Owners submit", "Property owners submit their rental property for review."], ["02", "We verify", "Our team reviews the submitted property information."], ["03", "Listings go live", "Approved properties are published for tenants to explore."], ["04", "Tenants enquire", "Potential tenants browse and send enquiries directly."]].map(([number, title, text]) => <div key={number} className="border border-primary/20 bg-white p-5"><p className="mono text-xs text-primary">{number}</p><h3 className="mt-8 font-display text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-5 text-neutral-700">{text}</p></div>)}</div></div></section>
-    <section className="bg-primary"><div className="container-custom flex flex-col justify-between gap-6 py-12 text-white md:flex-row md:items-center"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-white/70">Looking for a rental property?</p><h2 className="mt-2 text-3xl font-semibold">Browse verified listings across multiple categories.</h2></div><Link className="btn-accent shrink-0" to="/properties">Explore rentals</Link></div></section>
+
+    {/* Featured Listings Section */}
+    <section className="border-t border-[#E2E8F0] bg-[#F8FAFC] py-16 md:py-20">
+      <div className="container-custom">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="mono text-[11px] font-semibold uppercase tracking-[.14em] text-accent">
+              Top Picked Spaces
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-neutral-900 md:text-4xl">
+              Featured Listings
+            </h2>
+            <p className="mt-2 text-sm text-neutral-700">
+              Hand-picked verified rental spaces ready for immediate move-in.
+            </p>
+          </div>
+          <Link className="flex items-center gap-1 text-sm font-semibold text-primary hover:underline" to="/properties">
+            Explore all featured →
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="text-sm text-neutral-700">Loading featured listings…</div>
+        ) : data?.data?.length ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {data.data.map((property: Property) => (
+              <article key={property._id} className="card-hover flex h-full flex-col">
+                <Link to={`/properties/${property._id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">
+                  {property.images?.[0]?.url ? (
+                    <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={property.images[0].url} alt={property.title} />
+                  ) : (
+                    <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>
+                  )}
+                  <span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white flex items-center gap-1">
+                    <span>✦</span> Featured
+                  </span>
+                </Link>
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p>
+                      <h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3>
+                      <p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong>
+                      <small className="block text-[10px] text-neutral-700">per month</small>
+                    </div>
+                  </div>
+                  <div className="mt-5 grid grid-cols-3 border-y border-[#E2E8F0] py-3 text-center text-xs text-neutral-700">
+                    <span>{property.bedrooms || '—'} BHK</span>
+                    <span>{property.bathrooms || '—'} bath</span>
+                    <span>{property.area} {property.areaUnit || 'sq ft'}</span>
+                  </div>
+                  <Link className="btn-primary btn-sm mt-4 w-full text-center" to={`/properties/${property._id}`}>View details</Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-[#E2E8F0] p-10 text-center">
+            <p className="font-display text-lg">No featured listings right now.</p>
+            <Link className="btn-primary mt-5" to="/properties">Explore Rentals</Link>
+          </div>
+        )}
+      </div>
+    </section>
+
+    {/* Approved Rentals Section */}
+    <section className="container-custom py-16 md:py-20"><div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Approved rentals</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Recently added properties</h2><p className="mt-2 text-sm text-neutral-700">New listings that have completed our review process.</p></div><Link className="text-sm font-semibold text-primary hover:underline" to="/properties">Explore all rentals →</Link></div>{isLoading ? <div className="text-sm text-neutral-700">Loading recently added properties…</div> : data?.data?.length ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3">{data.data.map((property: Property) => <RecentCard key={property._id} property={property} />)}</div> : <div className="rounded-lg border border-dashed border-[#E2E8F0] p-10 text-center"><p className="font-display text-lg">No approved rentals are available right now.</p><p className="mt-2 text-sm text-neutral-700">Please check back soon or explore all rental listings.</p><Link className="btn-primary mt-5" to="/properties">Explore Rentals</Link></div>}</section>
+
+    {/* How BookMySpace Works Section with Animations & Vector Icons */}
+    <section id="how-it-works" className="border-t border-[#E2E8F0] bg-gradient-to-b from-[#eef2ff] to-[#F8FAFC] py-16 md:py-24 relative overflow-hidden">
+      <div className="container-custom relative z-10">
+        <div className="max-w-xl">
+          <p className="mono text-[11px] font-semibold uppercase tracking-[.14em] text-primary">
+            How BookMySpace works
+          </p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl font-display">
+            From property submission to tenant enquiry.
+          </h2>
+          <p className="mt-3 text-sm text-neutral-700">
+            A seamless 4-step process built to ensure quality, trust, and speed for owners and tenants alike.
+          </p>
+        </div>
+
+        {/* Step Flow Grid with Framer Motion Stagger & Vector Graphics */}
+        <div className="mt-12 grid gap-6 md:grid-cols-4 relative">
+          {howItWorksSteps.map((step, idx) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.12 }}
+              whileHover={{ y: -6 }}
+              className="group relative flex flex-col justify-between rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <span className="w-9 h-9 rounded-full bg-primary text-white font-mono text-xs font-bold flex items-center justify-center shadow-md group-hover:bg-accent transition-colors">
+                  {step.number}
+                </span>
+                <div className="p-2.5 rounded-xl bg-[#F8FAFC] group-hover:bg-primary/10 transition-colors">
+                  {step.icon}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-display text-lg font-bold text-neutral-900 group-hover:text-primary transition-colors">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-neutral-700">
+                  {step.text}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Bottom Call to Action Banner */}
+    <section className="bg-primary"><div className="container-custom flex flex-col justify-between gap-6 py-12 text-white md:flex-row md:items-center"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-white/70">Looking for a rental property?</p><h2 className="mt-2 text-3xl font-semibold">Browse verified listings across multiple categories.</h2></div><Link className="btn-accent shrink-0" to="/properties">Explore Rentals</Link></div></section>
   </>;
 }

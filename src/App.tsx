@@ -5,6 +5,7 @@ import { useAuth } from './store/authContext';
 import PublicLayout from './layouts/PublicLayout';
 import OwnerLayout from './layouts/OwnerLayout';
 import AdminLayout from './layouts/AdminLayout';
+import ScrollToTop from './components/common/ScrollToTop';
 
 const Home = lazy(() => import('./pages/public/Home'));
 const PropertyList = lazy(() => import('./pages/public/PropertyList'));
@@ -40,7 +41,8 @@ const Loading = () => <div className="flex items-center justify-center min-h-scr
 export default function App() {
   return (
     <Suspense fallback={<Loading />}>
-    <Routes>
+      <ScrollToTop />
+      <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/properties" element={<PropertyList />} />
