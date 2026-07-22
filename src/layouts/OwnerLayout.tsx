@@ -31,9 +31,17 @@ export default function OwnerLayout() {
         }`}
       >
         <div className="px-5 py-4 border-b border-[#E2E8F0]">
-          <Link to="/owner" className="flex items-center group">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = '/';
+            }}
+            className="flex items-center group cursor-pointer"
+            title="Refresh BookMySpace Home"
+          >
             <img src="/logo.png" alt="BookMySpace" className="h-7 w-auto object-contain" />
-          </Link>
+          </a>
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto scrollbar-thin">

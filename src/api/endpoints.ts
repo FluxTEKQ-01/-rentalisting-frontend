@@ -162,20 +162,20 @@ export const notificationApi = {
 
 export const propertyCategories: { value: PropertyCategory; label: string }[] = [
   { value: 'office', label: 'Office Spaces' },
-  { value: 'shop_retail', label: 'Shops & Retail' },
-  { value: 'warehouse', label: 'Warehouses' },
+  { value: 'commercial_building', label: 'Commercial Buildings' },
+  { value: 'coworking', label: 'Co-working Spaces' },
+  { value: 'shooting_location', label: 'Shooting Locations' },
   { value: 'house_apartment', label: 'Houses & Apartments' },
   { value: 'villa', label: 'Villas' },
   { value: 'open_plot_land', label: 'Open Plots & Land' },
-  { value: 'event_venue', label: 'Event Venues' },
-  { value: 'coworking', label: 'Co-working Spaces' },
-  { value: 'commercial_building', label: 'Commercial Buildings' },
-  { value: 'parking', label: 'Parking Spaces' },
+  { value: 'shop_retail', label: 'Shops & Retail' },
   { value: 'showroom', label: 'Showrooms' },
+  { value: 'warehouse', label: 'Warehouses' },
   { value: 'industrial', label: 'Industrial Spaces' },
-  { value: 'hotel_banquet', label: 'Hotels & Banquet Halls' },
-  { value: 'shooting_location', label: 'Shooting Locations' },
   { value: 'storage', label: 'Storage Spaces' },
+  { value: 'event_venue', label: 'Event Venues' },
+  { value: 'hotel_banquet', label: 'Hotels & Banquet Halls' },
+  { value: 'parking', label: 'Parking Spaces' },
 ];
 
 export const amenitiesList = [

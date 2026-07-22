@@ -38,6 +38,8 @@ function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?
 
 const Loading = () => <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div></div>;
 
+const CategorySEOPage = lazy(() => import('./pages/public/CategorySEOPage'));
+
 export default function App() {
   return (
     <Suspense fallback={<Loading />}>
@@ -47,7 +49,17 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
-        <Route path="/categories/:slug" element={<PropertyList />} />
+        <Route path="/categories/:slug" element={<CategorySEOPage />} />
+        <Route path="/category/:categorySlug" element={<CategorySEOPage />} />
+
+        {/* High Volume SEO Specific Category Routes */}
+        <Route path="/apartments-for-rent" element={<CategorySEOPage defaultCategory="house_apartment" />} />
+        <Route path="/independent-villas-for-rent" element={<CategorySEOPage defaultCategory="villa" />} />
+        <Route path="/farm-land-plots-for-rent" element={<CategorySEOPage defaultCategory="open_plot_land" />} />
+        <Route path="/office-spaces-for-rent" element={<CategorySEOPage defaultCategory="office" />} />
+        <Route path="/shops-retail-for-rent" element={<CategorySEOPage defaultCategory="shop_retail" />} />
+        <Route path="/warehouses-for-rent" element={<CategorySEOPage defaultCategory="warehouse" />} />
+
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />

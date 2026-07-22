@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { propertyApi, propertyCategories } from '../../api/endpoints';
+import { getCategorySlug } from '../../config/categorySeoData';
 import type { Property } from '../../types';
 import ScrollVelocity from '../../components/ui/ScrollVelocity';
 
@@ -37,20 +38,20 @@ const categoryIcons: Record<string, string> = {
 
 const visualCategories = [
   { title: 'Office Spaces', value: 'office', desc: 'Corporate offices, desk setups & commercial workspace hubs', image: '/categories/office.png' },
-  { title: 'Houses & Apartments', value: 'house_apartment', desc: 'Verified apartments, builder floors & family homes', image: '/categories/apartment.png' },
-  { title: 'Shops & Retail', value: 'shop_retail', desc: 'High footfall retail outlets, stores & commercial units', image: '/categories/retail.png' },
-  { title: 'Luxury Villas', value: 'villa', desc: 'Independent villas, luxury bungalows & private estates', image: '/categories/villa.png' },
-  { title: 'Warehouses', value: 'warehouse', desc: 'Industrial storage, logistics centers & godowns', image: '/categories/warehouse.png' },
-  { title: 'Event Venues', value: 'event_venue', desc: 'Banquet halls, celebration grounds & party venues', image: '/categories/event.png' },
-  { title: 'Open Plots & Land', value: 'open_plot_land', desc: 'Commercial & residential land plots for lease', image: '/categories/land.png' },
-  { title: 'Co-working Spaces', value: 'coworking', desc: 'Shared desks, private cabins & startup workspaces', image: '/categories/coworking.png' },
   { title: 'Commercial Buildings', value: 'commercial_building', desc: 'Standalone towers & commercial business complexes', image: '/categories/commercial.png' },
-  { title: 'Parking Spaces', value: 'parking', desc: 'Dedicated vehicle parking slots & fleet storage', image: '/categories/parking.png' },
-  { title: 'Showrooms', value: 'showroom', desc: 'Glass-front display showrooms & retail brand outlets', image: '/categories/showroom.png' },
-  { title: 'Industrial Spaces', value: 'industrial', desc: 'Manufacturing plants, factories & industrial units', image: '/categories/industrial.png' },
-  { title: 'Hotels & Banquets', value: 'hotel_banquet', desc: 'Hospitality properties, hotels & banquet spaces', image: '/categories/hotel_banquet.png' },
+  { title: 'Co-working Spaces', value: 'coworking', desc: 'Shared desks, private cabins & startup workspaces', image: '/categories/coworking.png' },
   { title: 'Shooting Locations', value: 'shooting_location', desc: 'Film sets, photo studios & production sets', image: '/categories/shooting_location.png' },
-  { title: 'Storage Spaces', value: 'storage', desc: 'Self-storage lockers, inventory & safe deposit space', image: '/categories/storage.png' }
+  { title: 'Houses & Apartments', value: 'house_apartment', desc: 'Verified apartments, builder floors & family homes', image: '/categories/apartment.png' },
+  { title: 'Villas', value: 'villa', desc: 'Independent villas, luxury bungalows & private estates', image: '/categories/villa.png' },
+  { title: 'Open Plots & Land', value: 'open_plot_land', desc: 'Commercial & residential land plots for lease', image: '/categories/land.png' },
+  { title: 'Shops & Retail', value: 'shop_retail', desc: 'High footfall retail outlets, stores & commercial units', image: '/categories/retail.png' },
+  { title: 'Showrooms', value: 'showroom', desc: 'Glass-front display showrooms & retail brand outlets', image: '/categories/showroom.png' },
+  { title: 'Warehouses', value: 'warehouse', desc: 'Industrial storage, logistics centers & godowns', image: '/categories/warehouse.png' },
+  { title: 'Industrial Spaces', value: 'industrial', desc: 'Manufacturing plants, factories & industrial units', image: '/categories/industrial.png' },
+  { title: 'Storage Spaces', value: 'storage', desc: 'Self-storage lockers, inventory & safe deposit space', image: '/categories/storage.png' },
+  { title: 'Event Venues', value: 'event_venue', desc: 'Banquet halls, celebration grounds & party venues', image: '/categories/event.png' },
+  { title: 'Hotels & Banquet Halls', value: 'hotel_banquet', desc: 'Hospitality properties, hotels & banquet spaces', image: '/categories/hotel_banquet.png' },
+  { title: 'Parking Spaces', value: 'parking', desc: 'Dedicated vehicle parking slots & fleet storage', image: '/categories/parking.png' }
 ];
 
 // Vector Graphics for How It Works Steps
@@ -139,7 +140,60 @@ export default function Home() {
   const search = (event: React.FormEvent) => { event.preventDefault(); const query = new URLSearchParams(); if (location) query.set('keyword', location); if (type) query.set('propertyType', type); navigate(`/properties${query.size ? `?${query}` : ''}`); };
   
   return <>
-    <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore Rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="border border-primary/20 bg-white/75 p-5 shadow-[12px_12px_0_#0F4C81] backdrop-blur-sm"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Quick search</p><h2 className="mt-2 text-2xl font-semibold">Find a space that fits.</h2><form onSubmit={search} className="mt-6 space-y-3"><label className="text-xs font-semibold text-neutral-700">Location<input className="input-field mt-1" value={location} onChange={e => setLocation(e.target.value)} placeholder="Search by area or keyword" /></label><label className="text-xs font-semibold text-neutral-700">Property type<select className="input-field mt-1" value={type} onChange={e => setType(e.target.value)}><option value="">Any type</option>{propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label><button className="btn-primary w-full" type="submit"><Icon name="search" />Search rentals</button></form><p className="mt-4 flex items-center gap-2 text-xs leading-5 text-neutral-700"><Icon name="shield" />Only reviewed listings are published.</p></div></div></section>
+    <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore Rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl relative overflow-hidden">
+            {/* Category Tabs */}
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4 mb-5 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setType('house_apartment')}
+                className={`rounded-lg px-3 py-1.5 transition-colors ${type === 'house_apartment' || !type ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                Rent
+              </button>
+              <button
+                type="button"
+                onClick={() => setType('office')}
+                className={`rounded-lg px-3 py-1.5 transition-colors ${type === 'office' ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                Commercial
+              </button>
+              <button
+                type="button"
+                onClick={() => setType('open_plot_land')}
+                className={`rounded-lg px-3 py-1.5 transition-colors ${type === 'open_plot_land' ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                Plots / Land
+              </button>
+              <button
+                type="button"
+                onClick={() => setType('villa')}
+                className={`rounded-lg px-3 py-1.5 transition-colors ${type === 'villa' ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                Villas
+              </button>
+            </div>
+
+            <h2 className="text-xl font-bold text-slate-900">Find a space that fits.</h2>
+            <form onSubmit={search} className="mt-4 space-y-3.5">
+              <label className="block text-xs font-semibold text-neutral-700">
+                Location
+                <input className="input-field mt-1" value={location} onChange={e => setLocation(e.target.value)} placeholder="Search by area, landmark or city..." />
+              </label>
+              <label className="block text-xs font-semibold text-neutral-700">
+                Property type
+                <select className="input-field mt-1" value={type} onChange={e => setType(e.target.value)}>
+                  <option value="">Any type</option>
+                  {propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}
+                </select>
+              </label>
+              <button className="btn-primary w-full shadow-md" type="submit">
+                <Icon name="search" /> Search rentals
+              </button>
+            </form>
+            <p className="mt-4 flex items-center gap-2 text-xs leading-5 text-neutral-700">
+              <Icon name="shield" /> Only reviewed listings are published.
+            </p>
+          </div></div></section>
 
     <div className="bg-primary py-3.5 border-b border-[#0a355c] shadow-inner overflow-hidden select-none">
       <ScrollVelocity
@@ -161,7 +215,7 @@ export default function Home() {
       />
     </div>
 
-    <section className="container-custom py-16 md:py-24">
+    <section id="browse-categories" className="container-custom py-16 md:py-24">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mono text-[11px] uppercase tracking-[.14em] text-primary font-semibold">Browse rentals</p>
@@ -177,7 +231,7 @@ export default function Home() {
         {visualCategories.map(cat => (
           <Link
             key={cat.value}
-            to={`/properties?propertyType=${cat.value}`}
+            to={`/category/${getCategorySlug(cat.value as any)}`}
             className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_36px_rgba(15,76,129,0.10)]"
           >
             <div className="flex h-44 w-full items-center justify-center p-2 rounded-xl bg-[#F8FAFC]">
