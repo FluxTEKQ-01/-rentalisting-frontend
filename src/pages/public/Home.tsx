@@ -7,6 +7,8 @@ import { getCategorySlug } from '../../config/categorySeoData';
 import type { Property } from '../../types';
 import ScrollVelocity from '../../components/ui/ScrollVelocity';
 
+import SeoHead from '../../components/seo/SeoHead';
+
 const heroTaglineItems = [
   "Verified Listings. Trusted Rentals.",
   "Find. Connect. Rent.",
@@ -131,7 +133,12 @@ function Icon({ name }: { name: 'search' | 'pin' | 'shield' | 'message' | 'filte
 
 function RecentCard({ property }: { property: Property }) {
   const image = property.images?.[0]?.url;
-  return <article className="card-hover flex h-full flex-col"><Link to={`/properties/${property._id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">{image ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}<span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span></Link><div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div><div className="mt-5 grid grid-cols-3 border-y border-[#E2E8F0] py-3 text-center text-xs text-neutral-700"><span>{property.bedrooms || '—'} BHK</span><span>{property.bathrooms || '—'} bath</span><span>{property.area} {property.areaUnit || 'sq ft'}</span></div><Link className="btn-outline btn-sm mt-4" to={`/properties/${property._id}`}>View details</Link></div></article>;
+  const specs: string[] = [];
+  if (property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
+  if (property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
+  if (property.area && property.area > 0) specs.push(`${property.area} ${property.areaUnit || 'sq ft'}`);
+
+  return <article className="card-hover flex h-full flex-col"><Link to={`/properties/${property._id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">{image ? <img className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}<span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span></Link><div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div>{specs.length > 0 && <div className={`mt-5 grid ${specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}>{specs.map((s, i) => <span key={i}>{s}</span>)}</div>}<Link className="btn-outline btn-sm mt-auto mt-4" to={`/properties/${property._id}`}>View details</Link></div></article>;
 }
 
 export default function Home() {
@@ -140,6 +147,10 @@ export default function Home() {
   const search = (event: React.FormEvent) => { event.preventDefault(); const query = new URLSearchParams(); if (location) query.set('keyword', location); if (type) query.set('propertyType', type); navigate(`/properties${query.size ? `?${query}` : ''}`); };
   
   return <>
+    <SeoHead
+      title="Find Verified Rental Properties & List Your Property"
+      description="BookMySpace is a trusted rental marketplace where you can find verified homes, apartments, offices, shops, warehouses, PGs, and commercial spaces. List your property for free and connect directly with genuine tenants across India."
+    />
     <section className="hero-sheen border-b border-[#E2E8F0]"><div className="container-custom grid-rule grid min-h-[440px] items-center gap-8 py-12 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Rental marketplace</p><h1 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-[1.04] tracking-[-.045em] text-primary md:text-6xl">Find the perfect space for your needs.</h1><p className="mt-6 max-w-xl leading-7 text-neutral-700">Discover verified rental spaces across multiple categories. Every published listing is reviewed before it goes live, so you can search with confidence.</p><div className="mt-8 flex flex-wrap gap-3"><Link className="btn-primary" to="/properties">Explore Rentals <Icon name="arrow" /></Link><Link className="btn-outline" to="/register">List your property</Link></div></div><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl relative overflow-hidden">
             {/* Category Tabs */}
             <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4 mb-5 text-xs font-bold">
@@ -361,12 +372,19 @@ export default function Home() {
                       <small className="block text-[10px] text-neutral-700">per month</small>
                     </div>
                   </div>
-                  <div className="mt-5 grid grid-cols-3 border-y border-[#E2E8F0] py-3 text-center text-xs text-neutral-700">
-                    <span>{property.bedrooms || '—'} BHK</span>
-                    <span>{property.bathrooms || '—'} bath</span>
-                    <span>{property.area} {property.areaUnit || 'sq ft'}</span>
-                  </div>
-                  <Link className="btn-primary btn-sm mt-4 w-full text-center" to={`/properties/${property._id}`}>View details</Link>
+                  {(() => {
+                    const specs: string[] = [];
+                    if (property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
+                    if (property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
+                    if (property.area && property.area > 0) specs.push(`${property.area} ${property.areaUnit || 'sq ft'}`);
+                    if (specs.length === 0) return null;
+                    return (
+                      <div className={`mt-5 grid ${specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}>
+                        {specs.map((s, i) => <span key={i}>{s}</span>)}
+                      </div>
+                    );
+                  })()}
+                  <Link className="btn-primary btn-sm mt-auto mt-4 w-full text-center" to={`/properties/${property._id}`}>View details</Link>
                 </div>
               </article>
             ))}

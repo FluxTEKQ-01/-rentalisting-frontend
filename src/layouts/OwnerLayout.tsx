@@ -1,7 +1,9 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../store/authContext';
 import { Button } from '../components/ui';
+import { notificationApi } from '../api/endpoints';
 
 const sidebarLinks = [
   { to: '/owner', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -15,6 +17,15 @@ export default function OwnerLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { data: notificationsData } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationApi.list(),
+    staleTime: 15000,
+    refetchInterval: 30000,
+  });
+
+  const unreadCount = (notificationsData as any)?.unreadCount || 0;
 
   return (
     <div className="min-h-screen bg-neutral flex">
@@ -62,8 +73,10 @@ export default function OwnerLayout() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={link.icon} />
                 </svg>
                 {link.label}
-                {link.label === 'Notifications' && (
-                  <span className="ml-auto w-2 h-2 rounded-full bg-accent" />
+                {link.label === 'Notifications' && unreadCount > 0 && (
+                  <span className="ml-auto flex items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white min-w-[1.25rem] shadow-xs">
+                    {unreadCount}
+                  </span>
                 )}
               </Link>
             );

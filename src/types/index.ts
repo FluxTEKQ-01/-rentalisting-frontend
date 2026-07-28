@@ -14,6 +14,7 @@ export type PropertyCategory =
   | 'shop_retail'
   | 'warehouse'
   | 'house_apartment'
+  | 'apartment'
   | 'villa'
   | 'open_plot_land'
   | 'event_venue'

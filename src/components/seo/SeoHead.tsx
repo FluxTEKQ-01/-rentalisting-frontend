@@ -9,6 +9,28 @@ export interface SeoHeadProps {
   ogImage?: string;
 }
 
+export const DEFAULT_KEYWORDS = [
+  'BookMySpace',
+  'rental marketplace',
+  'verified rental properties',
+  'house for rent',
+  'apartment for rent',
+  'office space for rent',
+  'commercial property',
+  'warehouse for rent',
+  'shop for rent',
+  'PG accommodation',
+  'coworking space',
+  'property listing',
+  'list property online',
+  'rental homes',
+  'real estate rentals',
+  'rental platform India',
+  'property search',
+  'verified listings',
+  'rent property online',
+];
+
 export default function SeoHead({
   title,
   description,
@@ -46,9 +68,8 @@ export default function SeoHead({
 
     // Meta Description & Keywords
     setMetaTag('meta[name="description"]', 'name', 'description', description);
-    if (keywords.length > 0) {
-      setMetaTag('meta[name="keywords"]', 'name', 'keywords', keywords.join(', '));
-    }
+    const combinedKeywords = Array.from(new Set([...keywords, ...DEFAULT_KEYWORDS]));
+    setMetaTag('meta[name="keywords"]', 'name', 'keywords', combinedKeywords.join(', '));
 
     // OpenGraph Meta
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', siteTitle);

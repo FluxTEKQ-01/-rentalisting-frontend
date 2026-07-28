@@ -101,7 +101,7 @@ export default function About() {
               <span className="text-[#F58220]">It's our process.</span>
             </h1>
             <p className="mt-6 max-w-xl text-sm md:text-base leading-relaxed text-neutral-700 font-medium">
-              BookMySpace was created to eliminate rental fraud, fake listings, and middleman markups. Every single property on our platform undergoes a manual inspection before it goes live.
+              BookMySpace is a trusted rental marketplace where you can find verified homes, apartments, offices, shops, warehouses, PGs, and commercial spaces. List your property for free and connect directly with genuine tenants across India.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link className="btn-primary shadow-md" to="/properties">

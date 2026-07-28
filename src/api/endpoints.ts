@@ -87,6 +87,11 @@ export const propertyApi = {
     apiClient
       .delete<ApiResponse<null>>('/uploads/image', { data: { publicId } })
       .then((r) => r.data),
+
+  contactOwner: (id: string, data: { name: string; email: string; phone?: string; message: string }) =>
+    apiClient
+      .post<ApiResponse<{ inquirySent: boolean; ownerEmail?: string }>>(`/properties/${id}/contact`, data)
+      .then((r) => r.data),
 };
 
 export const adminApi = {
@@ -133,12 +138,17 @@ export const adminApi = {
 export const reviewApi = {
   list: (propertyId: string, params?: Record<string, string>) =>
     apiClient
-      .get<PaginatedResponse<Review>>(`/reviews/property/${propertyId}${toQueryString(params || {})}`)
+      .get<any>(`/reviews/property/${propertyId}${toQueryString(params || {})}`)
       .then((r) => r.data),
 
-  create: (propertyId: string, data: { rating: number; comment: string }) =>
+  create: (propertyId: string, data: { rating: number; comment: string; userName?: string }) =>
     apiClient
       .post<ApiResponse<{ review: Review }>>(`/reviews/property/${propertyId}`, data)
+      .then((r) => r.data),
+
+  update: (reviewId: string, data: { rating?: number; comment?: string; userName?: string }) =>
+    apiClient
+      .put<ApiResponse<{ review: Review }>>(`/reviews/${reviewId}`, data)
       .then((r) => r.data),
 
   delete: (reviewId: string) =>
@@ -166,6 +176,7 @@ export const propertyCategories: { value: PropertyCategory; label: string }[] = 
   { value: 'coworking', label: 'Co-working Spaces' },
   { value: 'shooting_location', label: 'Shooting Locations' },
   { value: 'house_apartment', label: 'Houses & Apartments' },
+  { value: 'apartment', label: 'Apartments' },
   { value: 'villa', label: 'Villas' },
   { value: 'open_plot_land', label: 'Open Plots & Land' },
   { value: 'shop_retail', label: 'Shops & Retail' },

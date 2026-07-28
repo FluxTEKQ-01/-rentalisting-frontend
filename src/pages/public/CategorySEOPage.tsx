@@ -14,10 +14,11 @@ interface CategorySEOPageProps {
 }
 
 export default function CategorySEOPage({ defaultCategory }: CategorySEOPageProps) {
-  const { categorySlug } = useParams<{ categorySlug: string }>();
+  const { categorySlug, slug } = useParams<{ categorySlug?: string; slug?: string }>();
+  const currentSlug = categorySlug || slug;
 
   // Determine current category info
-  const slugToUse = categorySlug || (defaultCategory ? Object.values(CATEGORY_SEO_DATA).find(c => c.categoryValue === defaultCategory)?.slug : 'apartments') || 'apartments';
+  const slugToUse = currentSlug || (defaultCategory ? Object.values(CATEGORY_SEO_DATA).find(c => c.categoryValue === defaultCategory)?.slug : 'apartments') || 'apartments';
   const categoryInfo: CategorySeoInfo = getSeoDataBySlug(slugToUse) || CATEGORY_SEO_DATA['apartments'];
 
   // Filter state
@@ -30,20 +31,16 @@ export default function CategorySEOPage({ defaultCategory }: CategorySEOPageProp
     queryFn: () => propertyApi.list({
       propertyType: categoryInfo.categoryValue,
       city: cityFilter || undefined,
-      status: 'approved',
+      status: 'published,approved',
     }),
   });
 
   const properties = propertiesResponse?.data || [];
 
-  // Combine real listing images with curated category fallback photography
-  const listingImages = properties
-    .map((p) => (p.images && p.images.length > 0 ? p.images[0].url : ''))
-    .filter(Boolean);
-  const heroImagesToUse =
-    listingImages.length > 0
-      ? Array.from(new Set([...listingImages, ...(categoryInfo.heroImages || [])]))
-      : categoryInfo.heroImages || [];
+  // Curated category photography for the hero background slider
+  const heroImagesToUse = (categoryInfo.heroImages || []).filter(
+    (url) => !url.includes('1545324418-cc1a3fa10c00') && !url.includes('tiger')
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">

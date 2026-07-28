@@ -20,6 +20,9 @@ export default function EditListing() {
   const isRejected = property?.status === 'rejected';
 
   const [formData, setFormData] = useState<any>(null);
+  const [existingImages, setExistingImages] = useState<{ url: string; publicId: string }[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
     if (data?.data?.property && !formData) {
@@ -38,15 +41,22 @@ export default function EditListing() {
         videoUrl: p.videoUrl || '',
         location: p.location,
       });
+      setExistingImages(p.images || []);
     }
   }, [data, formData]);
 
   const mutation = useMutation({
     mutationFn: async () => {
-      if (isRejected) {
-        return propertyApi.resubmit(id!, formData);
+      let uploadedImages: { url: string; publicId: string }[] = [];
+      if (newFiles.length > 0) {
+        const uploadRes = await propertyApi.uploadImages(newFiles);
+        uploadedImages = uploadRes.data.images;
       }
-      await propertyApi.update(id!, formData);
+      const allImages = [...existingImages, ...uploadedImages];
+      if (isRejected) {
+        return propertyApi.resubmit(id!, { ...formData, images: allImages });
+      }
+      await propertyApi.update(id!, { ...formData, images: allImages });
       await propertyApi.submit(id!);
     },
     onSuccess: () => {
@@ -102,6 +112,29 @@ export default function EditListing() {
         ? prev.amenities.filter((a: string) => a !== amenity)
         : [...prev.amenities, amenity],
     }));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + existingImages.length + newFiles.length > 10) {
+      toast.error('Maximum 10 images allowed');
+      return;
+    }
+    setNewFiles((prev) => [...prev, ...files]);
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => setNewImagePreviews((prev) => [...prev, ev.target?.result as string]);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewImage = (index: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -229,6 +262,46 @@ export default function EditListing() {
 
         <div className="space-y-4">
           <h2 className="font-bold text-lg text-primary font-display">Media</h2>
+          <div>
+            <label className="block text-sm font-medium text-neutral-900 mb-2">
+              Images (max 10)
+            </label>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+              {existingImages.map((img, i) => (
+                <div key={`existing-${i}`} className="relative aspect-square rounded-lg overflow-hidden bg-[#E2E8F0] group">
+                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(i)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-error text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+              {newImagePreviews.map((preview, i) => (
+                <div key={`new-${i}`} className="relative aspect-square rounded-lg overflow-hidden bg-[#E2E8F0] group">
+                  <img src={preview} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeNewImage(i)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-error text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+              {existingImages.length + newFiles.length < 10 && (
+                <label className="aspect-square rounded-lg border-2 border-dashed border-[#E2E8F0] flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
+                  <svg className="w-8 h-8 text-neutral-700/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handleImageUpload} />
+                </label>
+              )}
+            </div>
+            <p className="text-xs text-neutral-700/60 mt-2">{existingImages.length + newFiles.length} / 10 images</p>
+          </div>
           <Input
             label="Video URL"
             value={formData.videoUrl}

@@ -12,6 +12,7 @@ export default function ReviewListing() {
   const queryClient = useQueryClient();
 
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [feedbackError, setFeedbackError] = useState('');
 
@@ -45,6 +46,17 @@ export default function ReviewListing() {
       navigate('/admin/listings');
     },
     onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to reject'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => propertyApi.delete(id!),
+    onSuccess: () => {
+      invalidateAfterReview();
+      toast.success('Listing deleted successfully');
+      setDeleteModalOpen(false);
+      navigate('/admin/listings');
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to delete listing'),
   });
 
   const handleReject = () => {
@@ -155,33 +167,45 @@ export default function ReviewListing() {
           </Card>
         )}
 
-        {isPending && (
-          <Card className="p-6">
-            <h3 className="font-semibold text-primary font-display mb-4">Actions</h3>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={() => approveMutation.mutate()}
-                loading={approveMutation.isPending}
-                className="flex-1"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Approve & Publish
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => setRejectModalOpen(true)}
-                className="flex-1"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Reject with Feedback
-              </Button>
-            </div>
-          </Card>
-        )}
+        <Card className="p-6">
+          <h3 className="font-semibold text-primary font-display mb-4">Actions</h3>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {isPending && (
+              <>
+                <Button
+                  onClick={() => approveMutation.mutate()}
+                  loading={approveMutation.isPending}
+                  className="flex-1"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Approve & Publish
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setRejectModalOpen(true)}
+                  className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Reject with Feedback
+                </Button>
+              </>
+            )}
+            <Button
+              variant="danger"
+              onClick={() => setDeleteModalOpen(true)}
+              className={isPending ? "sm:w-auto" : "w-full sm:w-auto"}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Listing
+            </Button>
+          </div>
+        </Card>
 
         {property.feedback && (
           <Card className="p-6 border-l-4 border-error">
@@ -221,6 +245,28 @@ export default function ReviewListing() {
               disabled={feedback.trim().length < 10}
             >
               Confirm Reject
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Delete Property Listing">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-700 leading-relaxed">
+            Are you sure you want to permanently delete <strong className="text-slate-900">{property.title}</strong>?
+            This will permanently remove this listing from the database.
+          </p>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate()}
+            >
+              Delete Listing
             </Button>
           </div>
         </div>

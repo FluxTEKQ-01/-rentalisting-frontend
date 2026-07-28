@@ -30,7 +30,7 @@ export const CATEGORY_SEO_DATA: Record<string, CategorySeoInfo> = {
     h1Title: 'Apartments & Flats for Rent',
     heroSubtitle: 'Discover premium studio apartments, modern high-rise flats, and family-friendly gated community homes verified for quality & comfort.',
     heroImages: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1920&q=80',
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1920&q=80',
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80',
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
