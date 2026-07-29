@@ -170,6 +170,14 @@ export const notificationApi = {
     apiClient.put<ApiResponse<null>>('/notifications/read-all').then((r) => r.data),
 };
 
+export const commentApi = {
+  create: (propertyId: string, data: { name: string; email: string; address?: string; comment: string }) =>
+    apiClient.post<ApiResponse<{ comment: any }>>('/comments', { ...data, propertyId }).then((r) => r.data),
+
+  list: (propertyId: string) =>
+    apiClient.get<PaginatedResponse<any>>(`/comments/property/${propertyId}`).then((r) => r.data),
+};
+
 export const propertyCategories: { value: PropertyCategory; label: string }[] = [
   { value: 'office', label: 'Office Spaces' },
   { value: 'commercial_building', label: 'Commercial Buildings' },

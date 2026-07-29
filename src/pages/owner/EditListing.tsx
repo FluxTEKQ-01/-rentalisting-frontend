@@ -116,8 +116,13 @@ export default function EditListing() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + existingImages.length + newFiles.length > 10) {
-      toast.error('Maximum 10 images allowed');
+    if (files.length + existingImages.length + newFiles.length > 4) {
+      toast.error('Maximum 4 images allowed');
+      return;
+    }
+    const oversized = files.find((f) => f.size > 2 * 1024 * 1024);
+    if (oversized) {
+      toast.error('Image size exceeds 2MB — please reduce image size');
       return;
     }
     setNewFiles((prev) => [...prev, ...files]);
@@ -264,7 +269,7 @@ export default function EditListing() {
           <h2 className="font-bold text-lg text-primary font-display">Media</h2>
           <div>
             <label className="block text-sm font-medium text-neutral-900 mb-2">
-              Images (max 10)
+              Images (max 4)
             </label>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
               {existingImages.map((img, i) => (
@@ -291,7 +296,7 @@ export default function EditListing() {
                   </button>
                 </div>
               ))}
-              {existingImages.length + newFiles.length < 10 && (
+              {existingImages.length + newFiles.length < 4 && (
                 <label className="aspect-square rounded-lg border-2 border-dashed border-[#E2E8F0] flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
                   <svg className="w-8 h-8 text-neutral-700/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
@@ -300,7 +305,7 @@ export default function EditListing() {
                 </label>
               )}
             </div>
-            <p className="text-xs text-neutral-700/60 mt-2">{existingImages.length + newFiles.length} / 10 images</p>
+            <p className="text-xs text-neutral-700/60 mt-2">{existingImages.length + newFiles.length} / 4 images | Max 2MB per image | JPEG, PNG, WebP</p>
           </div>
           <Input
             label="Video URL"

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../store/authContext';
 import { Button, Input } from '../../components/ui';
+import SeoHead from '../../components/seo/SeoHead';
 import toast from 'react-hot-toast';
 
 function AuthVectorGraphics() {
@@ -161,7 +162,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 hero-sheen">
+    <>
+      <SeoHead title="Sign In to BookMySpace" description="Sign in to your BookMySpace account to manage listings and enquiries." />
+      <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 hero-sheen">
       <div className="container-custom max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -229,5 +232,6 @@ export default function Login() {
         </motion.div>
       </div>
     </div>
+    </>
   );
 }

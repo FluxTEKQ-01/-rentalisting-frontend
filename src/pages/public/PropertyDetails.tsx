@@ -16,7 +16,7 @@ function MapAutoRecenter({ coords }: { coords: [number, number] }) {
   return null;
 }
 import { motion } from 'framer-motion';
-import { propertyApi, reviewApi, propertyCategories } from '../../api/endpoints';
+import { propertyApi, reviewApi, commentApi, propertyCategories } from '../../api/endpoints';
 import { useAuth } from '../../store/authContext';
 import { Button, Card } from '../../components/ui';
 import { LoadingSpinner } from '../../components/ui';
@@ -34,6 +34,13 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
+
+const maskEmail = (email?: string) => {
+  if (!email) return '';
+  const parts = email.split('@');
+  if (parts.length !== 2) return email;
+  return parts[0][0] + '***@' + parts[1];
+};
 
 const CITY_COORDINATES: Record<string, [number, number]> = {
   hyderabad: [17.3850, 78.4867],
@@ -243,6 +250,27 @@ export default function PropertyDetails() {
     }
   };
 
+  const [commentForm, setCommentForm] = useState({ name: '', email: '', address: '', comment: '' });
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentForm.name.trim() || !commentForm.email.trim() || !commentForm.comment.trim()) {
+      toast.error('Please fill in name, email, and comment');
+      return;
+    }
+    setCommentSubmitting(true);
+    try {
+      await commentApi.create(id!, commentForm);
+      toast.success('Comment posted successfully!');
+      setCommentForm({ name: '', email: '', address: '', comment: '' });
+    } catch {
+      toast.error('Failed to post comment. Please try again.');
+    } finally {
+      setCommentSubmitting(false);
+    }
+  };
+
   const propertyData = data?.data?.property;
 
   useEffect(() => {
@@ -305,13 +333,24 @@ export default function PropertyDetails() {
     };
   }, [propertyData]);
 
-  if (isLoading) return <LoadingSpinner className="py-32" />;
+  if (isLoading) return (
+    <>
+      <SeoHead
+        title="Loading property details..."
+        description="Loading property details on BookMySpace"
+      />
+      <LoadingSpinner className="py-32" />
+    </>
+  );
   if (!data?.data?.property) return (
-    <div className="container-custom py-20 text-center">
-      <h2 className="font-display text-2xl font-bold text-primary mb-2">Property not found</h2>
-      <p className="text-neutral-700 mb-6">The property you're looking for doesn't exist or has been removed.</p>
-      <Link to="/properties"><Button variant="primary">Browse properties</Button></Link>
-    </div>
+    <>
+      <SeoHead title="Property not found" description="The requested property could not be found on BookMySpace" />
+      <div className="container-custom py-20 text-center">
+        <h2 className="font-display text-2xl font-bold text-primary mb-2">Property not found</h2>
+        <p className="text-neutral-700 mb-6">The property you're looking for doesn't exist or has been removed.</p>
+        <Link to="/properties"><Button variant="primary">Browse properties</Button></Link>
+      </div>
+    </>
   );
 
   const property = data.data.property;
@@ -514,7 +553,7 @@ export default function PropertyDetails() {
                 </div>
                 <div>
                   <p className="font-display font-bold text-primary">{property.owner?.name || 'Property Owner'}</p>
-                  <p className="text-sm text-neutral-700/60">{property.owner?.email}</p>
+                  <p className="text-sm text-neutral-700/60">{maskEmail(property.owner?.email)}</p>
                 </div>
               </div>
               <h2 className="font-display text-lg font-bold text-primary mb-4">Contact owner</h2>
@@ -933,6 +972,48 @@ export default function PropertyDetails() {
                   </div>
                 </div>
               )}
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+            <Card className="p-6">
+              <h2 className="font-display text-lg font-bold text-primary mb-4">Leave a Comment</h2>
+              <form onSubmit={handleCommentSubmit} className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Your Name *"
+                  value={commentForm.name}
+                  onChange={(e) => setCommentForm({ ...commentForm, name: e.target.value })}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Your Email *"
+                  value={commentForm.email}
+                  onChange={(e) => setCommentForm({ ...commentForm, email: e.target.value })}
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Your Address"
+                  value={commentForm.address}
+                  onChange={(e) => setCommentForm({ ...commentForm, address: e.target.value })}
+                  className="input-field"
+                />
+                <textarea
+                  placeholder="Write your comment... *"
+                  rows={3}
+                  value={commentForm.comment}
+                  onChange={(e) => setCommentForm({ ...commentForm, comment: e.target.value })}
+                  className="input-field resize-none"
+                  required
+                />
+                <Button type="submit" className="w-full justify-center" disabled={commentSubmitting}>
+                  {commentSubmitting ? 'Submitting...' : 'Post Comment'}
+                </Button>
+              </form>
             </Card>
           </motion.div>
         </div>

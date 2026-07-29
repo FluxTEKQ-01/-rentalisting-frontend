@@ -87,6 +87,10 @@ export default function SeoHead({
     // Canonical Link
     const href = canonicalUrl || window.location.href;
     setLinkTag('canonical', href);
+
+    return () => {
+      document.title = 'BookMySpace – Find Verified Rental Properties & List Your Property';
+    };
   }, [title, description, keywords, canonicalUrl, ogType, ogImage]);
 
   return null;

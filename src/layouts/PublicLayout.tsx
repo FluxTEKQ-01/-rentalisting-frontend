@@ -133,7 +133,22 @@ export default function PublicLayout() {
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Rental Properties</h3><div className="flex flex-col gap-2 text-sm text-white/70">{propertyCategories.map(cat => <Link key={cat.value} to={`/category/${getCategorySlug(cat.value)}`} onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>{cat.label}</Link>)}</div></div>
         <div><h3 className="mb-4 text-xs font-bold uppercase tracking-[.12em] text-white">Quick links</h3><div className="flex flex-col gap-3 text-sm text-white/70"><Link to="/" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Home</Link><Link to="/properties" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Explore Rentals</Link><Link to="/register" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>List your property</Link><Link to="/about" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>About us</Link><Link to="/contact" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Contact Us</Link></div></div>
       </div>
-      <div className="container-custom border-t border-white/10 py-6 text-[11px] text-white/50">&copy; {new Date().getFullYear()} BookMySpace. Reimagining real estate.</div>
+      <div className="container-custom border-t border-white/10 py-6 text-[11px] text-white/50">
+        <p>&copy; {new Date().getFullYear()} BookMySpace. Reimagining real estate.</p>
+        <p className="mt-1">
+          <span style={{ color: '#FF0000' }}>&#x2764;</span>{' '}
+          Designed &amp; developed by{' '}
+          <a
+            href="https://webbingprotechnologies.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/70 hover:text-white transition-colors underline underline-offset-2"
+          >
+            WebbingPro Technologies
+          </a>{' '}
+          9059329297
+        </p>
+      </div>
     </footer>
   </div>;
 }

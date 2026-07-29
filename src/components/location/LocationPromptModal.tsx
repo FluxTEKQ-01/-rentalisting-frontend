@@ -50,13 +50,17 @@ export default function LocationPromptModal() {
             data.address?.state_district ||
             'Nearby Area';
 
-          setDetectedLocation(city);
           localStorage.setItem('user_selected_location', city);
-        } catch {
-          setDetectedLocation('Current Location');
-          localStorage.setItem('user_selected_location', 'Current Location');
-        } finally {
           setLoading(false);
+          setIsOpen(false);
+          sessionStorage.setItem('location_prompt_dismissed', 'true');
+          navigate(`/properties?keyword=${encodeURIComponent(city)}`);
+        } catch {
+          localStorage.setItem('user_selected_location', 'Current Location');
+          setLoading(false);
+          setIsOpen(false);
+          sessionStorage.setItem('location_prompt_dismissed', 'true');
+          navigate(`/properties?keyword=${encodeURIComponent('Current Location')}`);
         }
       },
       (err) => {

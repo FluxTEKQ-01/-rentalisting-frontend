@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import SeoHead from '../../components/seo/SeoHead';
 
 const ContactSVG = () => (
   <svg viewBox="0 0 480 540" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
@@ -109,7 +110,9 @@ export default function Contact() {
   };
 
   return (
-    <div className="container-custom py-16 md:py-24">
+    <>
+      <SeoHead title="Contact Us – BookMySpace" description="Get in touch with BookMySpace. Have a question about a property or the platform? We're here to help." />
+      <div className="container-custom py-16 md:py-24">
       <div className="text-center mb-14">
         <p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Get in touch</p>
         <h1 className="section-title mt-3">Contact Us</h1>
@@ -193,5 +196,6 @@ export default function Contact() {
         </div>
       </div>
     </div>
+    </>
   );
 }
