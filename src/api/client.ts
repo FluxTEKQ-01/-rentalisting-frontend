@@ -20,8 +20,34 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Transform Supabase response format (id) to frontend format (_id)
+const transformSupabaseData = (data: any): any => {
+  if (!data) return data;
+
+  if (Array.isArray(data)) {
+    return data.map(item => transformSupabaseData(item));
+  }
+
+  if (typeof data === 'object' && data !== null) {
+    const transformed = { ...data };
+    if ('id' in transformed && !('_id' in transformed)) {
+      transformed._id = transformed.id;
+    }
+    return transformed;
+  }
+
+  return data;
+};
+
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data?.data) {
+      response.data.data = transformSupabaseData(response.data.data);
+    } else if (response.data) {
+      response.data = transformSupabaseData(response.data);
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
