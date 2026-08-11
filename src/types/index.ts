@@ -56,6 +56,7 @@ export interface PropertyLocation {
 
 export interface Property {
   _id: string;
+  slug?: string;
   title: string;
   description: string;
   propertyType: PropertyCategory;
