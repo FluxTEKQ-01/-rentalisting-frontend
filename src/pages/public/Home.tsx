@@ -210,7 +210,7 @@ export default function Home() {
     <div className="bg-primary py-3.5 border-b border-[#0a355c] shadow-inner overflow-hidden select-none">
       <ScrollVelocity
         texts={[
-          <span className="inline-flex items-center gap-6 px-4">
+          <span key="hero-taglines" className="inline-flex items-center gap-6 px-4">
             {heroTaglineItems.map((text, index) => (
               <span key={index} className="inline-flex items-center gap-6">
                 <span className="font-display text-sm md:text-base font-semibold tracking-wider uppercase text-white/95">

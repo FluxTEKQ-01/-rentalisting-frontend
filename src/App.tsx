@@ -14,6 +14,7 @@ const About = lazy(() => import('./pages/public/About'));
 const Contact = lazy(() => import('./pages/public/Contact'));
 const Login = lazy(() => import('./pages/public/Login'));
 const Register = lazy(() => import('./pages/public/Register'));
+const NotFound = lazy(() => import('./pages/public/NotFound'));
 
 const OwnerDashboard = lazy(() => import('./pages/owner/OwnerDashboard'));
 const MyListings = lazy(() => import('./pages/owner/MyListings'));
@@ -64,6 +65,9 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Catch-all: without this an unknown URL renders a blank white page */}
+        <Route path="*" element={<NotFound />} />
       </Route>
 
       <Route
