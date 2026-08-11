@@ -20,7 +20,11 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Transform Supabase response format (id) to frontend format (_id)
+// Transform Supabase response format to frontend format
+const snakeToCamel = (str: string): string => {
+  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+};
+
 const transformSupabaseData = (data: any): any => {
   if (!data) return data;
 
@@ -29,10 +33,20 @@ const transformSupabaseData = (data: any): any => {
   }
 
   if (typeof data === 'object' && data !== null) {
-    const transformed = { ...data };
-    if ('id' in transformed && !('_id' in transformed)) {
-      transformed._id = transformed.id;
+    const transformed: any = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      // Convert snake_case to camelCase
+      const camelKey = snakeToCamel(key);
+
+      // Special case: id → _id for backward compatibility
+      if (key === 'id' && !('_id' in data)) {
+        transformed._id = value;
+      }
+
+      transformed[camelKey] = value;
     }
+
     return transformed;
   }
 
