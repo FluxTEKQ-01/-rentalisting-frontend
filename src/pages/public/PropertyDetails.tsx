@@ -155,7 +155,7 @@ export default function PropertyDetails() {
   const [inquirySent, setInquirySent] = useState(false);
   const [geoCoords, setGeoCoords] = useState<[number, number] | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['property', id],
     queryFn: () => propertyApi.getById(id!),
     enabled: !!id,
@@ -340,6 +340,16 @@ export default function PropertyDetails() {
         description="Loading property details on BookMySpace"
       />
       <LoadingSpinner className="py-32" />
+    </>
+  );
+  if (error) return (
+    <>
+      <SeoHead title="Error loading property" description="Failed to load property details on BookMySpace" />
+      <div className="container-custom py-20 text-center">
+        <h2 className="font-display text-2xl font-bold text-primary mb-2">Error loading property</h2>
+        <p className="text-neutral-700 mb-6">Unable to load property details. Please try again later.</p>
+        <Link to="/properties"><Button variant="primary">Browse properties</Button></Link>
+      </div>
     </>
   );
   if (!data?.data?.property) return (
