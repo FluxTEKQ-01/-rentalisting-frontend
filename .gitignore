@@ -35,3 +35,6 @@ dist-ssr
 .impeccable/
 .agents/
 .playwright-mcp/
+
+# TypeScript build info
+*.tsbuildinfo
