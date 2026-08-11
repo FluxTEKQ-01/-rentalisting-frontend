@@ -36,6 +36,12 @@ const transformSupabaseData = (data: any): any => {
     const transformed: any = {};
 
     for (const [key, value] of Object.entries(data)) {
+      // Preserve the canonical _id key when the backend returns it directly
+      if (key === '_id') {
+        transformed._id = value;
+        continue;
+      }
+
       // Convert snake_case to camelCase
       const camelKey = snakeToCamel(key);
 
