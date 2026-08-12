@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, mobile: string, password: string, role?: string) => {
     const response = await authApi.register({ name, email, mobile, password, role });
-    const { user: userData, accessToken, refreshToken } = response;
+    const { user: userData, accessToken, refreshToken } = response.data;
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
