@@ -64,6 +64,9 @@ export default function PublicLayout() {
         </nav>
 
         <div className="hidden items-center gap-2.5 md:flex">
+          {!isAuthenticated && (
+            <Link to="/login" className="btn-outline btn-sm text-xs">Log in</Link>
+          )}
           {/* Post Property FREE Pill Button */}
           <Link
             to={isAuthenticated ? (user?.role === 'owner' ? '/owner/listings/create' : '/owner') : '/register'}
@@ -120,6 +123,9 @@ export default function PublicLayout() {
               FREE
             </span>
           </Link>
+          {!isAuthenticated && (
+            <Link to="/login" onClick={close} className="mt-1 btn-outline btn-sm w-full">Log in</Link>
+          )}
           {isAuthenticated && (
             <button className="mt-1 btn-outline btn-sm w-full" onClick={() => { logout(); close(); }}>Sign out</button>
           )}
