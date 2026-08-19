@@ -62,10 +62,12 @@ export interface Property {
   propertyType: PropertyCategory;
   price: number;
   maxPrice?: number;
+  pricePerSqft?: number;
+  isNegotiable?: boolean;
   currency: string;
   bedrooms: number;
   bathrooms: number;
-  area: number;
+  area: number | string;
   maxArea?: number;
   areaUnit: string;
   amenities: string[];
@@ -145,12 +147,15 @@ export interface PropertyFormData {
   title: string;
   description: string;
   propertyType: PropertyCategory;
-  price: number;
-  maxPrice?: number;
+  price: number | string;
+  maxPrice?: number | string;
+  pricePerSqft?: number;
+  isNegotiable?: boolean;
   bedrooms: number;
   bathrooms: number;
-  area: number;
+  area: number | string;
   maxArea?: number;
+  areaUnit?: string;
   amenities: string[];
   videoUrl: string;
   location: {

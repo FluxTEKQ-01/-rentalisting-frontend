@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { propertyApi, adminApi, propertyCategories } from '../../api/endpoints';
+import { propertyApi, adminApi, propertyCategories, hasAmenities } from '../../api/endpoints';
 import { toEmbedUrl } from '../../utils/video';
 import { Button, Card, Modal, LoadingSpinner, Badge } from '../../components/ui';
 
@@ -20,11 +20,14 @@ export default function ReviewListing() {
     queryKey: ['property', id],
     queryFn: () => propertyApi.getById(id!),
     enabled: !!id,
+    staleTime: 0,
   });
 
   const invalidateAfterReview = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-listings'] });
     queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    queryClient.invalidateQueries({ queryKey: ['property', id] });
+    queryClient.invalidateQueries({ queryKey: ['properties'] });
   };
 
   const approveMutation = useMutation({
@@ -72,7 +75,7 @@ export default function ReviewListing() {
   if (!data?.data?.property) return <div className="text-center py-20 text-neutral-800/60">Property not found</div>;
 
   const property = data.data.property;
-  const isPending = property.status === 'submitted' || property.status === 'pending_review';
+  const isPlotLand = property.propertyType === 'open_plot_land';
   const categoryLabel = propertyCategories.find((c) => c.value === property.propertyType)?.label || property.propertyType;
 
   return (
@@ -80,9 +83,9 @@ export default function ReviewListing() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-primary font-display">Review Listing</h1>
-          <p className="text-neutral-700">Review and take action on this property listing</p>
+          <p className="text-neutral-700">Review details and manage status for this property listing</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => navigate('/admin/listings')}>Back</Button>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/admin/listings')}>Back to Listings</Button>
       </div>
 
       <div className="space-y-6">
@@ -92,7 +95,7 @@ export default function ReviewListing() {
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-xl font-bold text-primary font-display">{property.title}</h2>
                 <Badge variant={property.status === 'rejected' ? 'error' : property.status === 'published' ? 'success' : 'warning'}>
-                  {property.status}
+                  {property.status.replace('_', ' ').toUpperCase()}
                 </Badge>
               </div>
               <p className="text-neutral-700">
@@ -100,16 +103,28 @@ export default function ReviewListing() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-accent">₹{property.price.toLocaleString()}</p>
-              <p className="text-sm text-neutral-700/60">per month</p>
+              <p className="text-2xl font-bold text-accent">₹{property.price.toLocaleString('en-IN')}</p>
+              <p className="text-sm text-neutral-700/60">{isPlotLand ? 'Total Plot Price' : 'per month'}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-4 py-4 border-y border-[#E2E8F0] mb-4">
-            {property.bedrooms > 0 && <span className="text-sm"><strong>{property.bedrooms}</strong> Beds</span>}
-            {property.bathrooms > 0 && <span className="text-sm"><strong>{property.bathrooms}</strong> Baths</span>}
-            <span className="text-sm"><strong>{property.area}</strong> {property.areaUnit}</span>
+            {!isPlotLand && property.bedrooms > 0 && <span className="text-sm"><strong>{property.bedrooms}</strong> Beds</span>}
+            {!isPlotLand && property.bathrooms > 0 && <span className="text-sm"><strong>{property.bathrooms}</strong> Baths</span>}
+            <span className="text-sm">
+              <strong>{String(property.area || '').match(/[a-zA-Z]/) ? property.area : `${property.area} ${property.areaUnit || 'sqft'}`}</strong>
+            </span>
             <span className="text-sm"><Badge variant="info">{categoryLabel}</Badge></span>
+            {isPlotLand && property.pricePerSqft ? (
+              <span className="text-sm bg-slate-100 px-2.5 py-1 rounded-md text-slate-700 font-medium">
+                ₹{property.pricePerSqft.toLocaleString('en-IN')}/sqft
+              </span>
+            ) : null}
+            {isPlotLand && property.isNegotiable && (
+              <span className="text-sm bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md font-medium border border-emerald-200">
+                Negotiable
+              </span>
+            )}
           </div>
 
           <div className="mb-4">
@@ -117,7 +132,7 @@ export default function ReviewListing() {
             <p className="text-neutral-700 text-sm whitespace-pre-line">{property.description}</p>
           </div>
 
-          {property.amenities?.length > 0 && (
+          {hasAmenities(property.propertyType) && property.amenities?.length > 0 && (
             <div className="mb-4">
               <h3 className="font-semibold text-primary font-display mb-2">Amenities</h3>
               <div className="flex flex-wrap gap-2">
@@ -168,36 +183,33 @@ export default function ReviewListing() {
         )}
 
         <Card className="p-6">
-          <h3 className="font-semibold text-primary font-display mb-4">Actions</h3>
+          <h3 className="font-semibold text-primary font-display mb-4">Admin Actions</h3>
           <div className="flex flex-col sm:flex-row gap-3">
-            {isPending && (
-              <>
-                <Button
-                  onClick={() => approveMutation.mutate()}
-                  loading={approveMutation.isPending}
-                  className="flex-1"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Approve & Publish
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setRejectModalOpen(true)}
-                  className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Reject with Feedback
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={() => approveMutation.mutate()}
+              loading={approveMutation.isPending}
+              disabled={property.status === 'published'}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              {property.status === 'published' ? 'Published (Approved)' : 'Approve & Publish'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setRejectModalOpen(true)}
+              className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {property.status === 'rejected' ? 'Update Rejection Feedback' : 'Reject with Feedback'}
+            </Button>
             <Button
               variant="danger"
               onClick={() => setDeleteModalOpen(true)}
-              className={isPending ? "sm:w-auto" : "w-full sm:w-auto"}
+              className="sm:w-auto"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

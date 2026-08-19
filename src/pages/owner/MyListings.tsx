@@ -95,7 +95,10 @@ export default function MyListings() {
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-neutral-900 truncate">{property.title}</p>
                       <p className="text-sm text-neutral-700">
-                        {property.location.city} — ₹{property.price.toLocaleString()}/mo
+                        {property.location.city} —{' '}
+                        {property.propertyType === 'open_plot_land'
+                          ? `₹${property.price.toLocaleString('en-IN')}`
+                          : `₹${property.price.toLocaleString('en-IN')}/mo`}
                       </p>
                       {property.status === 'rejected' && property.feedback && (
                         <p className="text-xs text-error mt-1 bg-error/5 px-2 py-1 rounded inline-block">

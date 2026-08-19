@@ -197,6 +197,23 @@ export const propertyCategories: { value: PropertyCategory; label: string }[] = 
   { value: 'parking', label: 'Parking Spaces' },
 ];
 
+export const CATEGORIES_WITH_AMENITIES = new Set<string>([
+  'office',
+  'coworking',
+  'commercial_building',
+  'house_apartment',
+  'apartment',
+  'villa',
+  'hotel_banquet',
+  'shooting_location',
+  'event_venue',
+]);
+
+export function hasAmenities(propertyType?: string | null): boolean {
+  if (!propertyType) return false;
+  return CATEGORIES_WITH_AMENITIES.has(propertyType);
+}
+
 export const amenitiesList = [
   'Parking',
   'Swimming Pool',

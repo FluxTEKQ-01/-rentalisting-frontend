@@ -245,7 +245,7 @@ export default function CategorySEOPage({ defaultCategory }: CategorySEOPageProp
                     <div className="mt-4 flex items-center gap-4 text-xs font-medium text-slate-600 border-t border-slate-100 pt-3">
                       {property.bedrooms > 0 && <span>{property.bedrooms} Beds</span>}
                       {property.bathrooms > 0 && <span>{property.bathrooms} Baths</span>}
-                      {property.area > 0 && <span>{property.area} {property.areaUnit || 'sq ft'}</span>}
+                      {Boolean(property.area) && <span>{String(property.area).match(/[a-zA-Z]/) ? property.area : `${property.area} ${property.areaUnit || 'sq ft'}`}</span>}
                     </div>
                   </div>
 

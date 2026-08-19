@@ -15,23 +15,23 @@ const slideVariants: Variants = {
     x: 0,
     opacity: 1,
     transition: {
-      x: { type: 'spring', stiffness: 260, damping: 30 },
-      opacity: { duration: 0.6 },
+      x: { type: 'spring', stiffness: 320, damping: 28 },
+      opacity: { duration: 0.4 },
     },
   },
   exit: (dir: number) => ({
     x: dir < 0 ? '100%' : '-100%',
     opacity: 0,
     transition: {
-      x: { type: 'spring', stiffness: 260, damping: 30 },
-      opacity: { duration: 0.6 },
+      x: { type: 'spring', stiffness: 320, damping: 28 },
+      opacity: { duration: 0.4 },
     },
   }),
 };
 
 export default function HeroBackgroundSlider({
   images,
-  autoSlideInterval = 4500,
+  autoSlideInterval = 3000,
 }: HeroBackgroundSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);

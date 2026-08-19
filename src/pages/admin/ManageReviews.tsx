@@ -9,12 +9,14 @@ export default function ManageReviews() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-reviews'],
     queryFn: () => adminApi.getReviews(),
+    staleTime: 0,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => reviewApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
       toast.success('Review deleted');
     },
     onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to delete review'),

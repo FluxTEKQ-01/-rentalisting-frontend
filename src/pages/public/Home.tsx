@@ -136,7 +136,10 @@ function RecentCard({ property }: { property: Property }) {
   const specs: string[] = [];
   if (property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
   if (property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
-  if (property.area && property.area > 0) specs.push(`${property.area} ${property.areaUnit || 'sq ft'}`);
+  if (property.area) {
+    const areaStr = String(property.area);
+    specs.push(areaStr.match(/[a-zA-Z]/) ? areaStr : `${property.area} ${property.areaUnit || 'sq ft'}`);
+  }
 
   const propertyLink = property.slug || property._id;
   return <article className="card-hover flex h-full flex-col"><Link to={`/properties/${propertyLink}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">{image ? <img loading="lazy" className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}<span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span></Link><div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h3 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div>{specs.length > 0 && <div className={`mt-5 grid ${specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}>{specs.map((s, i) => <span key={i}>{s}</span>)}</div>}<Link className="btn-outline btn-sm mt-auto mt-4" to={`/properties/${propertyLink}`}>View details</Link></div></article>;
@@ -221,7 +224,7 @@ export default function Home() {
             ))}
           </span>
         ]}
-        velocity={40}
+        velocity={75}
         numCopies={6}
         className="py-0.5"
       />
@@ -377,7 +380,10 @@ export default function Home() {
                     const specs: string[] = [];
                     if (property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
                     if (property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
-                    if (property.area && property.area > 0) specs.push(`${property.area} ${property.areaUnit || 'sq ft'}`);
+                    if (property.area) {
+                      const areaStr = String(property.area);
+                      specs.push(areaStr.match(/[a-zA-Z]/) ? areaStr : `${property.area} ${property.areaUnit || 'sq ft'}`);
+                    }
                     if (specs.length === 0) return null;
                     return (
                       <div className={`mt-5 grid ${specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}>

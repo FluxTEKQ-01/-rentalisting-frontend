@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertyApi, propertyCategories } from '../../api/endpoints';
@@ -8,26 +8,332 @@ import SeoHead from '../../components/seo/SeoHead';
 type FilterKey = 'keyword' | 'propertyType' | 'minPrice' | 'maxPrice' | 'bedrooms' | 'bathrooms' | 'sort';
 type Filters = Record<FilterKey, string>;
 
-const Icon = ({ name }: { name: 'pin' | 'heart' | 'tune' }) => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d={{ pin: 'M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z', heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.9-8.6a5.5 5.5 0 0 0-.1-7.8Z', tune: 'M4 7h10M18 7h2M4 17h2m4 0h10M14 4v6M8 14v6' }[name]} /></svg>;
+const Icon = ({ name }: { name: 'pin' | 'heart' | 'tune' }) => (
+  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d={
+        {
+          pin: 'M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
+          heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.9-8.6a5.5 5.5 0 0 0-.1-7.8Z',
+          tune: 'M4 7h10M18 7h2M4 17h2m4 0h10M14 4v6M8 14v6',
+        }[name]
+      }
+    />
+  </svg>
+);
 
 function RentalCard({ property }: { property: Property }) {
-  const [saved, setSaved] = useState(false); const image = property.images?.[0]?.url;
+  const [saved, setSaved] = useState(false);
+  const image = property.images?.[0]?.url;
+  const isPlotLand = property.propertyType === 'open_plot_land';
   const specs: string[] = [];
-  if (property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
-  if (property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
-  if (property.area && property.area > 0) specs.push(`${property.area} ${property.areaUnit || 'sq ft'}`);
+  if (!isPlotLand && property.bedrooms && property.bedrooms > 0) specs.push(`${property.bedrooms} BHK`);
+  if (!isPlotLand && property.bathrooms && property.bathrooms > 0) specs.push(`${property.bathrooms} bath`);
+  if (property.area) {
+    const areaStr = String(property.area);
+    specs.push(areaStr.match(/[a-zA-Z]/) ? areaStr : `${property.area} ${property.areaUnit || 'sq ft'}`);
+  }
+  if (isPlotLand && property.pricePerSqft) specs.push(`₹${property.pricePerSqft.toLocaleString('en-IN')}/sqft`);
 
   const propertyLink = property.slug || property._id;
-  return <article className="card-hover flex h-full flex-col"><Link to={`/properties/${propertyLink}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">{image ? <img loading="lazy" className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} /> : <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>}<span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span><button aria-label="Save rental" onClick={event => { event.preventDefault(); setSaved(!saved); }} className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-sm ${saved ? 'text-error' : 'text-secondary'}`}>{saved ? '♥' : '♡'}</button></Link><div className="flex flex-1 flex-col p-5"><div className="flex justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace('_', ' ')}</p><h2 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h2><p className="mt-2 flex items-center gap-1 text-xs text-neutral-700"><Icon name="pin" />{property.location.city}</p></div><div className="shrink-0 text-right"><strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong><small className="block text-[10px] text-neutral-700">per month</small></div></div>{property.description && <p className="mt-4 line-clamp-2 text-sm leading-5 text-neutral-700">{property.description}</p>}{specs.length > 0 && <div className={`mt-4 grid ${specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}>{specs.map((s, i) => <span key={i}>{s}</span>)}</div>}<Link className="btn-outline btn-sm mt-auto mt-4" to={`/properties/${propertyLink}`}>View details</Link></div></article>;
+  return (
+    <article className="card-hover flex h-full flex-col">
+      <Link to={`/properties/${propertyLink}`} className="relative block aspect-[16/10] overflow-hidden bg-[#E2E8F0]">
+        {image ? (
+          <img loading="lazy" className="h-full w-full object-cover transition duration-500 hover:scale-105" src={image} alt={property.title} />
+        ) : (
+          <div className="grid h-full place-items-center text-sm text-neutral-700">Image unavailable</div>
+        )}
+        <span className="absolute left-3 top-3 rounded bg-accent px-2 py-1 text-[10px] font-bold text-white">Verified</span>
+        <button
+          aria-label="Save rental"
+          onClick={(event) => {
+            event.preventDefault();
+            setSaved(!saved);
+          }}
+          className={`absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-sm ${saved ? 'text-error' : 'text-secondary'}`}
+        >
+          {saved ? '♥' : '♡'}
+        </button>
+      </Link>
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-primary">{property.propertyType.replace(/_/g, ' ')}</p>
+            <h2 className="mt-1 font-display text-lg font-semibold leading-5">{property.title}</h2>
+            <p className="mt-2 flex items-center gap-1 text-xs text-neutral-700">
+              <Icon name="pin" />
+              {property.location.city}
+            </p>
+          </div>
+          <div className="shrink-0 text-right">
+            <strong className="font-display text-base text-primary">₹{property.price.toLocaleString('en-IN')}</strong>
+            <small className="block text-[10px] text-neutral-700">
+              {isPlotLand ? (property.isNegotiable ? 'Negotiable Price' : 'Total Price') : 'per month'}
+            </small>
+          </div>
+        </div>
+        {property.description && <p className="mt-4 line-clamp-2 text-sm leading-5 text-neutral-700">{property.description}</p>}
+        {specs.length > 0 && (
+          <div
+            className={`mt-4 grid ${
+              specs.length === 3 ? 'grid-cols-3' : specs.length === 2 ? 'grid-cols-2' : 'grid-cols-1'
+            } border-y border-[#E2E8F0] py-3 text-center text-xs font-medium text-neutral-700`}
+          >
+            {specs.map((s, i) => (
+              <span key={i}>{s}</span>
+            ))}
+          </div>
+        )}
+        <Link className="btn-outline btn-sm mt-auto mt-4" to={`/properties/${propertyLink}`}>
+          View details
+        </Link>
+      </div>
+    </article>
+  );
 }
 
 export default function PropertyList() {
-  const [params, setParams] = useSearchParams(); const [moreOpen, setMoreOpen] = useState(false);
-  const [filters, setFilters] = useState<Filters>({ keyword: params.get('keyword') || '', propertyType: params.get('propertyType') || '', minPrice: params.get('minPrice') || '', maxPrice: params.get('maxPrice') || '', bedrooms: params.get('bedrooms') || '', bathrooms: params.get('bathrooms') || '', sort: params.get('sort') || 'latest' });
-  const page = Number(params.get('page') || '1'); const query = { ...filters, page: String(page), limit: '12', status: 'published' };
-  const { data, isLoading, error } = useQuery({ queryKey: ['rentals', query], queryFn: () => propertyApi.list(query) });
-  const update = (key: FilterKey, value: string) => { const next = { ...filters, [key]: value }; setFilters(next); const nextParams = new URLSearchParams(); Object.entries(next).forEach(([k, v]) => { if (v && !(k === 'sort' && v === 'latest')) nextParams.set(k, v); }); nextParams.set('page', '1'); setParams(nextParams); };
-  const clear = () => { setFilters({ keyword: '', propertyType: '', minPrice: '', maxPrice: '', bedrooms: '', bathrooms: '', sort: 'latest' }); setParams({}); };
+  const [params, setParams] = useSearchParams();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const [filters, setFilters] = useState<Filters>({
+    keyword: params.get('keyword') || '',
+    propertyType: params.get('propertyType') || '',
+    minPrice: params.get('minPrice') || '',
+    maxPrice: params.get('maxPrice') || '',
+    bedrooms: params.get('bedrooms') || '',
+    bathrooms: params.get('bathrooms') || '',
+    sort: params.get('sort') || 'latest',
+  });
+
+  // Sync state when URL params change
+  useEffect(() => {
+    setFilters({
+      keyword: params.get('keyword') || '',
+      propertyType: params.get('propertyType') || '',
+      minPrice: params.get('minPrice') || '',
+      maxPrice: params.get('maxPrice') || '',
+      bedrooms: params.get('bedrooms') || '',
+      bathrooms: params.get('bathrooms') || '',
+      sort: params.get('sort') || 'latest',
+    });
+  }, [params]);
+
+  const page = Number(params.get('page') || '1');
+  const query = {
+    ...filters,
+    page: String(page),
+    limit: '12',
+    status: 'published,approved',
+  };
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['rentals', query],
+    queryFn: () => propertyApi.list(query),
+    staleTime: 0,
+  });
+
+  const update = (key: FilterKey, value: string) => {
+    const next = { ...filters, [key]: value };
+    setFilters(next);
+    const nextParams = new URLSearchParams();
+    Object.entries(next).forEach(([k, v]) => {
+      if (v && !(k === 'sort' && v === 'latest')) {
+        nextParams.set(k, v);
+      }
+    });
+    nextParams.set('page', '1');
+    setParams(nextParams);
+  };
+
+  const clear = () => {
+    setFilters({
+      keyword: '',
+      propertyType: '',
+      minPrice: '',
+      maxPrice: '',
+      bedrooms: '',
+      bathrooms: '',
+      sort: 'latest',
+    });
+    setParams({});
+  };
+
   const hasFilters = Object.entries(filters).some(([key, value]) => value && !(key === 'sort' && value === 'latest'));
-  return <div className="pb-16"><SeoHead title="Explore Verified Rentals" description="Browse verified rental spaces across multiple categories. Find homes, apartments, offices, shops, warehouses, PGs, and commercial properties." /><section className="border-b border-[#E2E8F0] bg-white"><div className="container-custom py-10 md:py-14"><p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Verified rental marketplace</p><h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-5xl">Explore rentals</h1><p className="mt-3 max-w-lg text-sm leading-6 text-neutral-700">Browse verified rental spaces across multiple categories.</p></div></section><section className="container-custom py-6"><div className="rounded-lg border border-[#E2E8F0] bg-white p-4 md:p-6"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6"><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">Location<input className="input-field mt-1 py-2.5 text-sm" value={filters.keyword} onChange={event => update('keyword', event.target.value)} placeholder="Search by area or keyword" /></label><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">Property type<select className="input-field mt-1 py-2.5 text-sm" value={filters.propertyType} onChange={event => update('propertyType', event.target.value)}><option value="">All types</option>{propertyCategories.map(category => <option key={category.value} value={category.value}>{category.label}</option>)}</select></label><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">Minimum rent<input className="input-field mt-1 py-2.5 text-sm" type="number" value={filters.minPrice} onChange={event => update('minPrice', event.target.value)} placeholder="₹ Any" /></label><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">Maximum rent<input className="input-field mt-1 py-2.5 text-sm" type="number" value={filters.maxPrice} onChange={event => update('maxPrice', event.target.value)} placeholder="₹ Any" /></label><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">BHK<select className="input-field mt-1 py-2.5 text-sm" value={filters.bedrooms} onChange={event => update('bedrooms', event.target.value)}><option value="">Any</option>{[1,2,3,4,5].map(value => <option key={value} value={String(value)}>{value}+</option>)}</select></label><button onClick={() => setMoreOpen(!moreOpen)} className="btn-ghost mt-auto border border-[#E2E8F0] py-2.5 text-xs"><Icon name="tune" />More filters</button></div>{moreOpen && <div className="mt-4 flex items-end gap-3 border-t border-[#E2E8F0] pt-4"><label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">Bathrooms<select className="input-field mt-1 py-2.5 text-sm" value={filters.bathrooms} onChange={event => update('bathrooms', event.target.value)}><option value="">Any</option>{[1,2,3,4].map(value => <option key={value} value={String(value)}>{value}+</option>)}</select></label>{hasFilters && <button className="btn-ghost btn-sm" onClick={clear}>Clear filters</button>}</div>}</div></section><main className="container-custom"><div className="mb-6 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-neutral-700">{isLoading ? 'Finding rentals…' : <><strong className="text-neutral-900">{data?.pagination?.total || 0}</strong> rentals found</>}</p><select className="input-field w-auto py-2 text-xs" value={filters.sort} onChange={event => update('sort', event.target.value)}><option value="latest">Newest listed</option><option value="price_low">Lowest rent</option><option value="price_high">Highest rent</option><option value="oldest">Oldest listed</option></select></div>{error ? <div className="rounded-lg border border-red-200 bg-red-50 p-12 text-center"><h2 className="text-xl font-semibold text-red-900">Failed to load rentals</h2><p className="mt-2 text-sm text-red-700">Unable to fetch properties. Please try again later.</p><button className="btn-primary mt-5" onClick={() => window.location.reload()}>Retry</button></div> : isLoading ? <div className="text-sm text-neutral-700">Loading rentals…</div> : data?.data?.length ? <><div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">{data.data.map((property: Property) => <RentalCard key={property._id} property={property} />)}</div>{data.pagination.totalPages > 1 && <div className="mt-10 flex justify-center gap-2">{Array.from({ length: data.pagination.totalPages }, (_, index) => index + 1).slice(0, 6).map(nextPage => <button key={nextPage} onClick={() => { const next = new URLSearchParams(params); next.set('page', String(nextPage)); setParams(next); }} className={`grid h-9 w-9 place-items-center rounded text-sm ${nextPage === page ? 'bg-primary text-white' : 'border border-[#E2E8F0] bg-white'}`}>{nextPage}</button>)}</div>}</> : <div className="rounded-lg border border-dashed border-[#E2E8F0] p-12 text-center"><h2 className="text-xl font-semibold">No rentals found</h2><p className="mt-2 text-sm text-neutral-700">Try changing your filters or search criteria.</p><button className="btn-primary mt-5" onClick={clear}>Clear filters</button></div>}</main></div>;
+
+  return (
+    <div className="pb-16">
+      <SeoHead
+        title="Explore Verified Rentals"
+        description="Browse verified rental spaces across multiple categories. Find homes, apartments, offices, shops, warehouses, PGs, and commercial properties."
+      />
+      <section className="border-b border-[#E2E8F0] bg-white">
+        <div className="container-custom py-10 md:py-14">
+          <p className="mono text-[11px] uppercase tracking-[.14em] text-primary">Verified rental marketplace</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-5xl">Explore rentals</h1>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-neutral-700">Browse verified rental spaces across multiple categories.</p>
+        </div>
+      </section>
+
+      <section className="container-custom py-6">
+        <div className="rounded-lg border border-[#E2E8F0] bg-white p-4 md:p-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+              Location
+              <input
+                className="input-field mt-1 py-2.5 text-sm"
+                value={filters.keyword}
+                onChange={(event) => update('keyword', event.target.value)}
+                placeholder="Search by area or keyword"
+              />
+            </label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+              Property type
+              <select
+                className="input-field mt-1 py-2.5 text-sm"
+                value={filters.propertyType}
+                onChange={(event) => update('propertyType', event.target.value)}
+              >
+                <option value="">All types</option>
+                {propertyCategories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+              Minimum rent
+              <input
+                className="input-field mt-1 py-2.5 text-sm"
+                type="number"
+                value={filters.minPrice}
+                onChange={(event) => update('minPrice', event.target.value)}
+                placeholder="₹ Any"
+              />
+            </label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+              Maximum rent
+              <input
+                className="input-field mt-1 py-2.5 text-sm"
+                type="number"
+                value={filters.maxPrice}
+                onChange={(event) => update('maxPrice', event.target.value)}
+                placeholder="₹ Any"
+              />
+            </label>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+              BHK
+              <select
+                className="input-field mt-1 py-2.5 text-sm"
+                value={filters.bedrooms}
+                onChange={(event) => update('bedrooms', event.target.value)}
+              >
+                <option value="">Any</option>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <option key={value} value={String(value)}>
+                    {value}+
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button onClick={() => setMoreOpen(!moreOpen)} className="btn-ghost mt-auto border border-[#E2E8F0] py-2.5 text-xs">
+              <Icon name="tune" />
+              More filters
+            </button>
+          </div>
+          {moreOpen && (
+            <div className="mt-4 flex items-end gap-3 border-t border-[#E2E8F0] pt-4">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+                Bathrooms
+                <select
+                  className="input-field mt-1 py-2.5 text-sm"
+                  value={filters.bathrooms}
+                  onChange={(event) => update('bathrooms', event.target.value)}
+                >
+                  <option value="">Any</option>
+                  {[1, 2, 3, 4].map((value) => (
+                    <option key={value} value={String(value)}>
+                      {value}+
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {hasFilters && (
+                <button className="btn-ghost btn-sm" onClick={clear}>
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <main className="container-custom">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-neutral-700">
+            {isLoading ? 'Finding rentals…' : <><strong className="text-neutral-900">{data?.pagination?.total || 0}</strong> rentals found</>}
+          </p>
+          <select className="input-field w-auto py-2 text-xs" value={filters.sort} onChange={(event) => update('sort', event.target.value)}>
+            <option value="latest">Newest listed</option>
+            <option value="price_low">Lowest rent</option>
+            <option value="price_high">Highest rent</option>
+            <option value="oldest">Oldest listed</option>
+          </select>
+        </div>
+
+        {error ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-12 text-center">
+            <h2 className="text-xl font-semibold text-red-900">Failed to load rentals</h2>
+            <p className="mt-2 text-sm text-red-700">Unable to fetch properties. Please try again later.</p>
+            <button className="btn-primary mt-5" onClick={() => window.location.reload()}>
+              Retry
+            </button>
+          </div>
+        ) : isLoading ? (
+          <div className="text-sm text-neutral-700">Loading rentals…</div>
+        ) : data?.data?.length ? (
+          <>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {data.data.map((property: Property) => (
+                <RentalCard key={property._id} property={property} />
+              ))}
+            </div>
+            {data.pagination.totalPages > 1 && (
+              <div className="mt-10 flex justify-center gap-2">
+                {Array.from({ length: data.pagination.totalPages }, (_, index) => index + 1)
+                  .slice(0, 6)
+                  .map((nextPage) => (
+                    <button
+                      key={nextPage}
+                      onClick={() => {
+                        const next = new URLSearchParams(params);
+                        next.set('page', String(nextPage));
+                        setParams(next);
+                      }}
+                      className={`grid h-9 w-9 place-items-center rounded text-sm ${
+                        nextPage === page ? 'bg-primary text-white' : 'border border-[#E2E8F0] bg-white'
+                      }`}
+                    >
+                      {nextPage}
+                    </button>
+                  ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="rounded-lg border border-dashed border-[#E2E8F0] p-12 text-center">
+            <h2 className="text-xl font-semibold">No rentals found</h2>
+            <p className="mt-2 text-sm text-neutral-700">Try changing your filters or search criteria.</p>
+            <button className="btn-primary mt-5" onClick={clear}>
+              Clear filters
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }

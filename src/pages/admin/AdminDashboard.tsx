@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-dashboard'],
     queryFn: () => adminApi.getDashboard(),
+    staleTime: 0,
   });
 
   const stats = data?.data;

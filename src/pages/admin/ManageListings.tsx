@@ -41,6 +41,7 @@ export default function ManageListings() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-listings', queryParams],
     queryFn: () => propertyApi.list(queryParams),
+    staleTime: 0,
   });
 
   const deleteMutation = useMutation({
@@ -48,6 +49,7 @@ export default function ManageListings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-listings'] });
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
       toast.success('Property listing deleted successfully!');
       setDeletingProperty(null);
     },
@@ -140,7 +142,14 @@ export default function ManageListings() {
                         <StatusBadge status={property.status} />
                       </div>
                       <p className="text-xs text-neutral-700 mt-1">
-                        <span className="font-medium text-slate-800">{property.owner?.name || 'Owner'}</span> — {property.location.city} — <strong className="text-primary font-display">₹{property.price.toLocaleString('en-IN')}/mo</strong>
+                        <span className="font-medium text-slate-800">{property.owner?.name || 'Owner'}</span> — {property.location.city} —{' '}
+                        <strong className="text-primary font-display">
+                          {property.propertyType === 'open_plot_land'
+                            ? `₹${property.price.toLocaleString('en-IN')}`
+                            : `₹${property.price.toLocaleString('en-IN')}/mo`}
+                        </strong>
+                        <span className="text-slate-400 mx-1">•</span>
+                        <span>{String(property.area || '').match(/[a-zA-Z]/) ? property.area : `${property.area} ${property.areaUnit || 'sqft'}`}</span>
                       </p>
                       <p className="text-[11px] text-neutral-700/50 mt-0.5">
                         Listed on {new Date(property.createdAt).toLocaleDateString()}

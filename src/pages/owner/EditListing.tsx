@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { propertyApi, propertyCategories, amenitiesList } from '../../api/endpoints';
+import { propertyApi, propertyCategories, amenitiesList, hasAmenities } from '../../api/endpoints';
 import { Button, Input, Select, Card, LoadingSpinner } from '../../components/ui';
+import { parseIndianCurrency } from '../../utils/currencyParser';
 import type { PropertyCategory } from '../../types';
 
 export default function EditListing() {
@@ -33,10 +34,13 @@ export default function EditListing() {
         propertyType: p.propertyType,
         price: p.price,
         maxPrice: p.maxPrice,
+        pricePerSqft: p.pricePerSqft,
+        isNegotiable: p.isNegotiable,
         bedrooms: p.bedrooms,
         bathrooms: p.bathrooms,
         area: p.area,
         maxArea: p.maxArea,
+        areaUnit: p.areaUnit || 'sqft',
         amenities: p.amenities || [],
         videoUrl: p.videoUrl || '',
         location: p.location,
@@ -53,10 +57,16 @@ export default function EditListing() {
         uploadedImages = uploadRes.data.images;
       }
       const allImages = [...existingImages, ...uploadedImages];
+      const payload = {
+        ...formData,
+        price: parseIndianCurrency(formData.price),
+        maxPrice: formData.maxPrice !== undefined && formData.maxPrice !== null && formData.maxPrice !== '' ? parseIndianCurrency(formData.maxPrice) : undefined,
+        images: allImages,
+      };
       if (isRejected) {
-        return propertyApi.resubmit(id!, { ...formData, images: allImages });
+        return propertyApi.resubmit(id!, payload);
       }
-      await propertyApi.update(id!, { ...formData, images: allImages });
+      await propertyApi.update(id!, payload);
       await propertyApi.submit(id!);
     },
     onSuccess: () => {
@@ -113,6 +123,18 @@ export default function EditListing() {
         : [...prev.amenities, amenity],
     }));
   };
+
+  const isPlotLand = formData.propertyType === 'open_plot_land';
+  const isOffice = formData.propertyType === 'office';
+  const isRangeType = !isPlotLand && !isOffice && ['warehouse', 'coworking', 'commercial_building', 'parking', 'showroom', 'industrial', 'storage'].includes(formData.propertyType);
+
+  const areaUnitOptions = [
+    { value: 'sqft', label: 'Sq. Ft. (sqft)' },
+    { value: 'sq_yards', label: 'Sq. Yards (Gaj)' },
+    { value: 'acres', label: 'Acres' },
+    { value: 'cents', label: 'Cents' },
+    { value: 'gunthas', label: 'Gunthas' },
+  ];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -218,52 +240,227 @@ export default function EditListing() {
 
         <div className="space-y-4">
           <h2 className="font-bold text-lg text-primary font-display">Details</h2>
-          {(formData.propertyType === 'commercial' || formData.propertyType === 'land') ? (
-            <>
+          {isPlotLand ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Input
+                    label="Total Expected Price * (₹)"
+                    type="text"
+                    value={formData.price !== undefined && formData.price !== null ? String(formData.price) : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      updateField('price', val);
+                      const parsedP = parseIndianCurrency(val);
+                      const numArea = parseIndianCurrency(formData.area);
+                      if (parsedP > 0 && numArea > 0 && formData.areaUnit === 'sqft') {
+                        updateField('pricePerSqft', Math.round(parsedP / numArea));
+                      }
+                    }}
+                    placeholder="e.g., 1.45cr, 75L, 45,000, 5000000"
+                  />
+                  {parseIndianCurrency(formData.price) > 0 && String(formData.price).match(/[a-zA-Z,]/) ? (
+                    <p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+                      <span>Converted:</span>
+                      <span className="font-mono bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        ₹{parseIndianCurrency(formData.price).toLocaleString('en-IN')}
+                      </span>
+                    </p>
+                  ) : null}
+                </div>
+                <div>
+                  <Input
+                    label="Price per Sq.Ft (₹)"
+                    type="text"
+                    value={formData.pricePerSqft !== undefined && formData.pricePerSqft !== null ? String(formData.pricePerSqft) : ''}
+                    onChange={(e) => updateField('pricePerSqft', parseIndianCurrency(e.target.value) || undefined)}
+                    placeholder="e.g., 2,500"
+                  />
+                  {formData.pricePerSqft && String(formData.pricePerSqft).match(/[,]/) ? (
+                    <p className="text-xs text-slate-600 mt-1">₹{parseIndianCurrency(formData.pricePerSqft).toLocaleString('en-IN')}/sqft</p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-slate-50 border border-[#E2E8F0] rounded-xl">
+                <input
+                  type="checkbox"
+                  id="editNegotiableCheckbox"
+                  checked={!!formData.isNegotiable}
+                  onChange={(e) => updateField('isNegotiable', e.target.checked)}
+                  className="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300 cursor-pointer"
+                />
+                <label htmlFor="editNegotiableCheckbox" className="text-sm font-medium text-slate-800 cursor-pointer select-none">
+                  Price is Negotiable
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  label="Total Plot / Land Area *"
+                  type="text"
+                  value={formData.area !== undefined && formData.area !== null ? String(formData.area) : ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updateField('area', val);
+                    const numVal = parseIndianCurrency(val);
+                    const currentPrice = parseIndianCurrency(formData.price);
+                    if (currentPrice > 0 && numVal > 0 && formData.areaUnit === 'sqft') {
+                      updateField('pricePerSqft', Math.round(currentPrice / numVal));
+                    }
+                  }}
+                  placeholder="e.g., 2 Acres, 2 acre 3 guntha, 2400"
+                />
+                <Select
+                  label="Area Unit *"
+                  options={areaUnitOptions}
+                  value={formData.areaUnit || 'sqft'}
+                  onChange={(e) => updateField('areaUnit', e.target.value)}
+                />
+              </div>
+            </div>
+          ) : isOffice ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Input
+                    label="Rental Price * (₹/month)"
+                    type="text"
+                    value={formData.price !== undefined && formData.price !== null ? String(formData.price) : ''}
+                    onChange={(e) => updateField('price', e.target.value)}
+                    placeholder="e.g., 65,000 or 65k"
+                  />
+                  {parseIndianCurrency(formData.price) > 0 && String(formData.price).match(/[a-zA-Z,]/) ? (
+                    <p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+                      <span>Converted:</span>
+                      <span className="font-mono bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        ₹{parseIndianCurrency(formData.price).toLocaleString('en-IN')}/mo
+                      </span>
+                    </p>
+                  ) : null}
+                </div>
+                <Input
+                  label="Rental Area * (sq ft)"
+                  type="text"
+                  value={formData.area !== undefined && formData.area !== null ? String(formData.area) : ''}
+                  onChange={(e) => updateField('area', e.target.value)}
+                  placeholder="e.g., 1800"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  label="Washrooms / Bathrooms"
+                  type="number"
+                  value={formData.bathrooms || ''}
+                  onChange={(e) => updateField('bathrooms', parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 2"
+                />
+              </div>
+            </div>
+          ) : isRangeType ? (
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-900 mb-1.5">Rental Price Range * (₹/month)</label>
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="Min Price" type="number" value={formData.price || ''} onChange={(e) => updateField('price', parseFloat(e.target.value) || 0)} />
-                  <Input label="Max Price" type="number" value={formData.maxPrice || ''} onChange={(e) => updateField('maxPrice', parseFloat(e.target.value) || undefined)} />
+                  <div>
+                    <Input
+                      label="Min Price"
+                      type="text"
+                      value={formData.price !== undefined && formData.price !== null ? String(formData.price) : ''}
+                      onChange={(e) => updateField('price', e.target.value)}
+                      placeholder="e.g., 50,000 or 50k"
+                    />
+                    {parseIndianCurrency(formData.price) > 0 && String(formData.price).match(/[a-zA-Z,]/) ? (
+                      <p className="text-xs text-emerald-700 font-semibold mt-1">₹{parseIndianCurrency(formData.price).toLocaleString('en-IN')}/mo</p>
+                    ) : null}
+                  </div>
+                  <div>
+                    <Input
+                      label="Max Price"
+                      type="text"
+                      value={formData.maxPrice !== undefined && formData.maxPrice !== null ? String(formData.maxPrice) : ''}
+                      onChange={(e) => updateField('maxPrice', e.target.value)}
+                      placeholder="e.g., 1,00,000 or 1L"
+                    />
+                    {formData.maxPrice && parseIndianCurrency(formData.maxPrice) > 0 && String(formData.maxPrice).match(/[a-zA-Z,]/) ? (
+                      <p className="text-xs text-emerald-700 font-semibold mt-1">₹{parseIndianCurrency(formData.maxPrice).toLocaleString('en-IN')}/mo</p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-neutral-900 mb-1.5">Area Range * (sq ft)</label>
                 <div className="grid grid-cols-2 gap-4">
-                  <Input label="Min Area" type="number" value={formData.area || ''} onChange={(e) => updateField('area', parseFloat(e.target.value) || 0)} />
-                  <Input label="Max Area" type="number" value={formData.maxArea || ''} onChange={(e) => updateField('maxArea', parseFloat(e.target.value) || undefined)} />
+                  <Input
+                    label="Min Area"
+                    type="text"
+                    value={formData.area !== undefined && formData.area !== null ? String(formData.area) : ''}
+                    onChange={(e) => updateField('area', e.target.value)}
+                    placeholder="e.g., 1000"
+                  />
+                  <Input
+                    label="Max Area"
+                    type="text"
+                    value={formData.maxArea !== undefined && formData.maxArea !== null ? String(formData.maxArea) : ''}
+                    onChange={(e) => updateField('maxArea', e.target.value)}
+                    placeholder="e.g., 5000"
+                  />
                 </div>
               </div>
-            </>
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Price (₹/month) *" type="number" value={formData.price || ''} onChange={(e) => updateField('price', parseFloat(e.target.value) || 0)} />
-              <Input label="Area (sq ft) *" type="number" value={formData.area || ''} onChange={(e) => updateField('area', parseFloat(e.target.value) || 0)} />
+              <div>
+                <Input
+                  label="Price (₹/month) *"
+                  type="text"
+                  value={formData.price !== undefined && formData.price !== null ? String(formData.price) : ''}
+                  onChange={(e) => updateField('price', e.target.value)}
+                  placeholder="e.g., 25,000 or 25k"
+                />
+                {parseIndianCurrency(formData.price) > 0 && String(formData.price).match(/[a-zA-Z,]/) ? (
+                  <p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+                    <span>Converted:</span>
+                    <span className="font-mono bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      ₹{parseIndianCurrency(formData.price).toLocaleString('en-IN')}/mo
+                    </span>
+                  </p>
+                ) : null}
+              </div>
+              <Input
+                label="Area (sq ft) *"
+                type="text"
+                value={formData.area !== undefined && formData.area !== null ? String(formData.area) : ''}
+                onChange={(e) => updateField('area', e.target.value)}
+                placeholder="e.g., 1200"
+              />
               <Input label="Bedrooms" type="number" value={formData.bedrooms || ''} onChange={(e) => updateField('bedrooms', parseInt(e.target.value) || 0)} />
               <Input label="Bathrooms" type="number" value={formData.bathrooms || ''} onChange={(e) => updateField('bathrooms', parseInt(e.target.value) || 0)} />
             </div>
           )}
         </div>
 
-        <div className="space-y-4">
-          <h2 className="font-bold text-lg text-primary font-display">Amenities</h2>
-          <div className="flex flex-wrap gap-2">
-            {amenitiesList.map((amenity) => (
-              <button
-                key={amenity}
-                type="button"
-                onClick={() => toggleAmenity(amenity)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                  formData.amenities.includes(amenity)
-                ? 'bg-primary text-white border-primary'
-                : 'bg-surface text-neutral-700 border-[#E2E8F0] hover:border-primary'
-                }`}
-              >
-                {amenity}
-              </button>
-            ))}
+        {hasAmenities(formData.propertyType) && (
+          <div className="space-y-4">
+            <h2 className="font-bold text-lg text-primary font-display">Amenities</h2>
+            <div className="flex flex-wrap gap-2">
+              {amenitiesList.map((amenity) => (
+                <button
+                  key={amenity}
+                  type="button"
+                  onClick={() => toggleAmenity(amenity)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                    formData.amenities.includes(amenity)
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-surface text-neutral-700 border-[#E2E8F0] hover:border-primary'
+                  }`}
+                >
+                  {amenity}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <h2 className="font-bold text-lg text-primary font-display">Media</h2>
